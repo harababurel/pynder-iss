@@ -5,7 +5,6 @@ import pynder
 import pickle
 
 from flask import Flask, request, session, g, escape, render_template, abort, redirect, url_for
-from flask_oauth import OAuth
 from flask_debugtoolbar import DebugToolbarExtension
 
 from PIL import Image
@@ -27,9 +26,6 @@ app.debug = True
 app.secret_key = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 toolbar = DebugToolbarExtension(app)
 
-FBID = "xxxxxxxxxxxxxxx"
-FBUSER = "xxxxxxxxxxxxxxxx@gmail.com"
-FBPASS = "xxxxxxxxxxxxx"
 PHOTO_DIR = 'tmp/'
 SHOWN_MATCHES = 100
 
@@ -40,173 +36,6 @@ app.config['SOCIAL_FACEBOOK'] = {
     'consumer_key': '464891386855067',
     'consumer_secret': '2e7bba43653aba506d1f7e119857643b'
 }
-
-oauth = OAuth()
-
-facebook = oauth.remote_app('facebook',
-    base_url='https://graph.facebook.com/',
-    request_token_url=None,
-    access_token_url='/oauth/access_token',
-    authorize_url='https://www.facebook.com/dialog/oauth',
-    consumer_key=app.config['SOCIAL_FACEBOOK']['consumer_key'],
-    consumer_secret=app.config['SOCIAL_FACEBOOK']['consumer_secret'],
-    request_token_params={'scope': ('email, ')}
-)
-
-@facebook.tokengetter
-def get_facebook_token():
-    return session.get('facebook_token')
-
-def pop_login_session():
-    session.pop('logged_in', None)
-    session.pop('facebook_token', None)
-
-@app.route("/facebook_login")
-def facebook_login():
-    return facebook.authorize(callback=url_for('facebook_authorized',
-        next=request.args.get('next'), _external=True))
-
-@app.route("/facebook_authorized")
-@facebook.authorized_handler
-def facebook_authorized(resp):
-    next_url = request.args.get('next') or url_for('index')
-    if resp is None or 'access_token' not in resp:
-        return redirect(next_url)
-
-    print(resp)
-
-    session['logged_in'] = True
-    session['access_token'] = resp['access_token']
-
-    print("access token: %s" % resp['access_token'])
-    print("!!!!!!!!!!!")
-
-    try:
-        dump_pynder_session_to_file(resp['access_token'])
-    except Exception as e:
-        print("problem: %r" % e)
-
-
-    return redirect(next_url)
-
-
-# def get_filename_from_url(url):
-#     return url.split("/")[-1]
-
-# def download_photo(url):
-#     filename = get_filename_from_url(url)
-#     filepath = os.path.join(PHOTO_DIR, filename)
-
-#     with urllib.request.urlopen(url) as response, open(filepath, 'wb') as out_file:
-#         shutil.copyfileobj(response, out_file)
-
-# def create_image_objects(files):
-#     images = []
-#     for filename in files:
-#         images.append(Image.open(filename))
-#     return images
-
-# def show_photos(images):
-#     for image in images:
-#         image.show()
-
-# def close_photos(images):
-#     for image in images:
-#         image.close()
-
-# def show_photos_with_feh(files):
-#     command = "feh -F -d " + ' '.join(files)
-#     call(command, shell=True)
-
-# def getFacebookIDFromUsername(username):
-#     try:
-#         r = requests.post(
-#                 "http://findmyfbid.com",
-#                 data={'url': "https://www.facebook.com/%s" % username}
-#                 )
-
-#         if r.status_code == 200 and r.reason == 'OK' and 'success' in r.url:
-#             return ''.join([x for x in r.url if '0' <= x and x <= '9'])
-#     except:
-#         return None
-
-# def vote_once(session):
-#     print("Remaining likes: %i" % session.likes_remaining)
-
-#     try:
-#         person = list(itertools.islice(session.nearby_users(), 0, 1))[0]
-#     except:
-#         print("Could not get any nearby persons.")
-#         exit(1)
-
-#     print("ID: %s" % person.id)
-#     print("Name: %s" % person.name)
-#     print("Birthdate: %s (%i years old)" % (str(person.birth_date).split()[0], person.age))
-#     print("Dist: %.0f km" % person.distance_km)
-#     if person.instagram_username is not None:
-#         print("Instagram: %s" % person.instagram_username)
-
-#     if person.bio.strip() not in [None, '']:
-#         print("Bio: %s" % person.bio)
-
-#     if person.schools != []:
-#         sep = ' ' if len(person.schools) == 1 else '\n'
-#         print("Schools:%s%s" % (sep, sep.join(person.schools)))
-
-#     if person.jobs != []:
-#         sep = ' ' if len(person.jobs) == 1 else '\n'
-#         print("Jobs:%s%s" % (sep, sep.join(person.jobs)))
-
-#     for photo_url in person.photos:
-#         try:
-#             download_photo(photo_url)
-#         except:
-#             print("Could not download photo. Skipping.")
-
-#     photo_filenames = map(lambda url: os.path.join(PHOTO_DIR, get_filename_from_url(url)), person.photos)
-#     # images = create_image_objects(photo_filenames)
-
-#     # show_photos(images)
-#     show_photos_with_feh(photo_filenames)
-
-#     match = None
-#     while True:
-#         print("Like? (y/n/s): ", end='')
-#         decision = input()
-
-#         if decision == 'y':
-#             match = person.like()
-#             break
-#         elif decision == 'n':
-#             match = person.dislike()
-#             break
-#         elif decision == 's':
-#             try:
-#                 match = person.superlike()
-#             except Exception as e:
-#                 print(e)
-#                 continue
-#             break
-
-#     print("Match: %r" % match)
-
-#     # close_photos(images)
-#     print()
-
-# def show(x):
-#     print("\n".join(dir(x)))
-
-# def show_messages(session, index):
-#     print('\n'.join(map(lambda x: x.__repr__(), list(itertools.islice(session.matches(), 0, 100))[index].messages)))
-
-# def send_message(session, index, message):
-#     print(list(itertools.islice(session.matches(), 0, 100))[index].message(message))
-
-# def read_credentials():
-#     FBUSER = input("Email: ")
-#     FBPASS = getpass.getpass("Pass: ")
-
-#     return (FBUSER, FBPASS)
 
 
 def get_access_token(email, password):
