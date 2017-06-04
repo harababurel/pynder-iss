@@ -78,7 +78,7 @@ def load_pynder_session(access_token):
 
 
 def main():
-    app.run()
+    app.run(host='0.0.0.0', port=config['port'])
 
 if __name__ == '__main__':
     main()
