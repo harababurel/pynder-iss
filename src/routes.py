@@ -21,6 +21,14 @@ def matches():
     return render_template("matches.html", session=session, matched_users=matched_users)
 
 
+@app.route("/swipe")
+def swipe():
+    pynder_session = load_pynder_session(session['access_token'])
+    current_person =  next(pynder_session.nearby_users())
+
+    return render_template("swipe.html", session=session, person=current_person)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -29,6 +37,8 @@ def login():
             password = request.form['password']
 
             access_token = get_access_token(username, password)
+
+            print("access token is %s" % access_token)
 
             session['username'] = username
             session['access_token'] = access_token
@@ -44,14 +54,15 @@ def login():
             return render_template('login.html')
 
 
-@app.route('/fb')
-def fb():
-    return render_template('fb.html')
+# @app.route('/fb')
+# def fb():
+#     return render_template('fb.html')
 
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('access_token', None)
     return redirect(url_for('index'))
 
 

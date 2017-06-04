@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<div class="row">
+  <div class="col-md-3"></div>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h1 class="panel-title">{{ person.name }} ({{ person.age }})
+          {% if person.distance_km %}
+            <span class="label label-warning">{{ "%.0f" % person.distance_km }} km away</span>
+          {% endif %}
+        </h1>
+      </div>
+      <div class="panel-body">
+
+        <div class="media">
+          <div class="media-left media-middle">
+              <img class="img-thumbnail" src="{{ person.photos[0] }}" style="max-width: 300px;">
+          </div>
+          <div class="media-body">
+
+            {% if person.bio %}
+            <div class="alert alert-warning" role="alert">{{ person.bio }}</div>
+
+              <!-- <p>Bio: {{ person.bio }}</p> -->
+            {% endif %}
+
+            {% if person.instagram_username %}
+              <div class="media">
+                <div class="media-left media-middle">
+                  <img src="static/social-instagram-new-square2-128.png" style="max-width: 15px;">
+                </div>
+                <div class="media-body">
+                  <a href="https://www.instagram.com/{{ person.instagram_username }}">{{ person.instagram_username }}</a>
+                </div>
+              </div>
+            {% endif %}
+
+            {% if person.schools %}
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h5 class="panel-title">Schools</h5>
+                </div>
+                <div class="panel-body">
+                  {% for school in person.schools %}
+                  <h5><span class="label label-default">{{ school }}</span></h5>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            {% if person.jobs %}
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h5 class="panel-title">Jobs</h5>
+                </div>
+                <div class="panel-body">
+                  {% for job in person.jobs %}
+                  <h5><span class="label label-default">{{ job }}</span></h5>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+
+
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+  <div class="col-md-3"></div>
+  <div class="col-md-3"></div>
+</div>
+
+{% endblock %}

@@ -15,7 +15,7 @@ from PIL import Image
 import re
 import requests
 import robobrowser
-
+import os.path
 
 app = Flask(__name__)
 app.debug = config['debug']
@@ -69,13 +69,22 @@ def dump_pynder_session_to_file(access_token):
 
 
 def load_pynder_session(access_token):
+    pynder_session = None
+    filename = "sessions/%s" % access_token
+
+    if not os.path.isfile(filename):
+        try:
+            print("session doesn't exist. trying to create a new one")
+            dump_pynder_session_to_file(access_token)
+        except Exception as e:
+            print("could not create new session. reason:\n%s" % e)
+
     try:
+        print("loading session from file")
         with open('sessions/%s' % access_token, 'rb') as f:
             pynder_session = pickle.load(f)
-    except:
-        dump_pynder_session_to_file(access_token)
-        with open('sessions/%s' % access_token, 'rb') as f:
-            pynder_session = pickle.load(f)
+    except Exception as e:
+        print("could not load session from file. reason:\n%s" % e)
 
     return pynder_session
 
