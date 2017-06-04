@@ -6,7 +6,9 @@ import pynder
 import pickle
 
 from flask import Flask, request, session, g, escape, render_template, abort, redirect, url_for
+from flask_login import login_required, login_user, logout_user, current_user
 from flask_debugtoolbar import DebugToolbarExtension
+from flask_sqlalchemy import SQLAlchemy
 
 from config import config
 
@@ -22,15 +24,15 @@ app.debug = config['debug']
 app.secret_key = config['secret_key']
 
 toolbar = DebugToolbarExtension(app)
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+for app_setting in config['app'].items():
+    app.config[app_setting[0]] = app_setting[1]
+
+db = SQLAlchemy(app)
+
 from routes import *
+from models import *
 
-
-# app.config['SOCIAL_FACEBOOK'] = {
-#     # 'consumer_key': '1827578677482273',
-#     'consumer_key': '464891386855067',
-#     'consumer_secret': '2e7bba43653aba506d1f7e119857643b'
-# }
 
 def get_access_token(email, password):
     mobile_user_agent = config['mobile_user_agent']
@@ -90,6 +92,10 @@ def load_pynder_session(access_token):
 
 
 def main():
+    try:
+        db.create_all()
+    except:
+        print("could not create database. maybe it already exists?")
     app.run(host='0.0.0.0', port=config['port'])
 
 if __name__ == '__main__':
