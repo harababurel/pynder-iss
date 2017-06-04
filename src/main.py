@@ -60,9 +60,12 @@ def create_pynder_session(FBTOKEN, FBID=None):
 
 
 def dump_pynder_session_to_file(access_token):
-    with open('sessions/%s' % access_token, 'wb') as g:
-        pickle.dump(create_pynder_session(access_token), g)
-        print("dumped session to file")
+    try:
+        with open('sessions/%s' % access_token, 'wb') as f:
+            pickle.dump(create_pynder_session(access_token), f)
+            print("dumped session to file")
+    except Exception as e:
+        print("could not dump pynder session to file. reason:\n%s" % e)
 
 
 def load_pynder_session(access_token):
