@@ -1,86 +1,85 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br>
-<div class="row">
-  <div class="col-md-3"></div>
-  <div class="col-md-6">
-    {% for user in matched_users %}
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h1 class="panel-title">{{ user.name }} ({{ user.age }})
-            {% if user.distance_km %}
-              <span class="label label-warning">{{ "%.0f" % user.distance_km }} km away</span>
-            {% endif %}
-          </h1>
+    <div class="row panel-group" id="accordion" style="height: 100%">
+        <div class="col-md-3 pre-scrollable" style="max-height: 100%">
+            {% for user in matched_users %}
+                <div class="panel panel-default" style="margin-bottom: 0">
+                    <div class="panel-heading" data-parent="#accordion" data-toggle="collapse"
+                         data-target="#{{ user.id }}">
+                        <h1 class="panel-title">
+                            <img class="img-thumbnail" src="{{ user.photos[0] }}"
+                                 style="display: inline-block; max-width: 50px;">
+                            {{ user.name }} ({{ user.age }})
+                            {% if user.distance_km %}
+                                <span class="label label-warning" style="float: right">{{ "%.0f" % user.distance_km }} km away</span>
+                            {% endif %}
+                        </h1>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
-        <div class="panel-body">
 
-          <div class="media">
-            <div class="media-left media-middle">
-                <img class="img-thumbnail" src="{{ user.photos[0] }}" style="max-width: 300px;">
-            </div>
-            <div class="media-body">
+        <div class="col-md-1"></div>
 
-              {% if user.bio %}
-              <div class="alert alert-warning" role="alert">{{ user.bio }}</div>
+        <div class="panel col-md-6">
+            {% for user in matched_users %}
+                <div class="panel-body collapse" id="{{ user.id }}">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img class="img-thumbnail" src="{{ user.photos[0] }}" style="max-width: 300px;">
+                        </div>
+                        <div class="media-body">
 
-                <!-- <p>Bio: {{ user.bio }}</p> -->
-              {% endif %}
+                            {% if user.bio %}
+                                <div class="alert alert-warning" role="alert">{{ user.bio }}</div>
+                            {% endif %}
 
-              {% if user.instagram_username %}
-                <div class="media">
-                  <div class="media-left media-middle">
-                    <img src="static/social-instagram-new-square2-128.png" style="max-width: 15px;">
-                  </div>
-                  <div class="media-body">
-                    <a href="https://www.instagram.com/{{ user.instagram_username }}">{{ user.instagram_username }}</a>
-                  </div>
+                            {% if user.instagram_username %}
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="../static/social-instagram-new-square2-128.png"
+                                             style="max-width: 15px;">
+                                    </div>
+                                    <div class="media-body">
+                                        <a href="https://www.instagram.com/{{ user.instagram_username }}">{{ user.instagram_username }}</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if user.schools %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">Schools</h5>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% for school in user.schools %}
+                                            <h5><span class="label label-default">{{ school }}</span></h5>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if user.jobs %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h5 class="panel-title">Jobs</h5>
+                                    </div>
+                                    <div class="panel-body">
+                                        {% for job in user.jobs %}
+                                            <h5><span class="label label-default">{{ job }}</span></h5>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-              {% endif %}
 
-              {% if user.schools %}
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h5 class="panel-title">Schools</h5>
-                  </div>
-                  <div class="panel-body">
-                    {% for school in user.schools %}
-                    <h5><span class="label label-default">{{ school }}</span></h5>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% endif %}
-
-              {% if user.jobs %}
-                <div class="panel panel-default">
-                  <div class="panel-heading">
-                    <h5 class="panel-title">Jobs</h5>
-                  </div>
-                  <div class="panel-body">
-                    {% for job in user.jobs %}
-                    <h5><span class="label label-default">{{ job }}</span></h5>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% endif %}
-
-
-
-
-            </div>
-          </div>
-
+            {% endfor %}
         </div>
-      </div>
-
-    {% endfor %}
-
-
-  </div>
-  <div class="col-md-3"></div>
-  <div class="col-md-3"></div>
-</div>
+        <div class="col-md-2"></div>
+    </div>
 
 {% endblock %}
