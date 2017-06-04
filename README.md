@@ -1,4 +1,4 @@
-# pynder_iss
+# pynder-iss
 
 Dependencies:
 - pynder
