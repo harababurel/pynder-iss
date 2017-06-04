@@ -14,17 +14,21 @@
         </h1>
       </div>
       <div class="panel-body">
-
         <div class="media">
           <div class="media-left media-middle">
-              <img class="img-thumbnail" src="{{ person.photos[0] }}" style="max-width: 300px;">
+            <div class="bss-slides">
+              {% for photo in person.photos %}
+                <figure>
+                  <img class="img-thumbnail" src="{{ photo }}" style="max-width: 350px;">
+                  <figcaption>{{ loop.index }} / {{ person.photos|length }}</figcaption>
+                </figure>
+              {% endfor %}
+            </div>
           </div>
           <div class="media-body">
 
             {% if person.bio %}
             <div class="alert alert-warning" role="alert">{{ person.bio }}</div>
-
-              <!-- <p>Bio: {{ person.bio }}</p> -->
             {% endif %}
 
             {% if person.instagram_username %}
@@ -65,8 +69,6 @@
             {% endif %}
 
 
-
-
           </div>
         </div>
 
@@ -77,5 +79,20 @@
   <div class="col-md-3"></div>
   <div class="col-md-3"></div>
 </div>
+
+<script src="static/better-simple-slideshow.min.js"></script>
+
+<script>
+  var opts = {
+    auto : {
+      speed : 2000,
+      pauseOnHover : true
+    },
+    fullScreen : false,
+    swipe : false
+  };
+
+  makeBSS('.bss-slides', opts);
+</script>
 
 {% endblock %}
