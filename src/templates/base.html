@@ -56,7 +56,8 @@
                     <ul class="nav navbar-nav navbar-right">
                         {% if session['username'] %}
                             <li><p class="navbar-text">Logged in as <br>{{ session['username'] }}</p></li>
-                            <li><a href="/logout">Logout</a></li>
+                            <li><a href="/logout">Logout
+                                <span class="glyphicon glyphicon-log-out"></span></a></li>
                         {% endif %}
                     </ul>
                 </div>
