@@ -27,6 +27,22 @@ def index():
     return redirect(url_for('matches'))
 
 
+@app.route("/chat/<id>", methods=['GET', 'POST'])
+def chat(id):
+    pynder_session = db_util.load_pynder_session(session['username'])
+    current_match = None
+    for match in list(itertools.islice(
+        pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.user.id == id:
+            current_match = match
+    print(current_match.id)
+    if request.method == 'POST':
+        message = request.form['message']
+        current_match.message(message)
+
+    return render_template("chat.html", match=current_match)
+
+
 @app.route("/matches")
 def matches():
     if not logged_in():
@@ -192,6 +208,22 @@ def logout():
     session.pop('username', None)
     # session.pop('access_token', None)
     return redirect(url_for('index'))
+
+
+@app.route('/messages', methods=['POST'])
+def messages():
+    pynder_session = db_util.load_pynder_session(session['username'])
+    current_match = None
+    for match in list(itertools.islice(
+            pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.id == request.json['match']:
+            current_match = match
+    if current_match is not None:
+        messageList = current_match.messages
+        messageList = messageList[int(request.json['messageNumber']):]
+        if len(messageList) > 0:
+            return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+    return ""
 
 
 @app.errorhandler(404)

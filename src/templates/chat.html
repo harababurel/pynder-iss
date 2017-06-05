@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <br>
+    <div class="row">
+        <div class="col-sm-3 col-sm-offset-4 frame">
+            <div class="panel panel-primary">
+                <div id="chat" class="panel-body">
+                    <ul class="chat">
+                    </ul>
+                </div>
+                <div class="panel-footer">
+                    <form action="/chat/{{ match.user.id }}" method="post">
+                        <div class="input-group">
+                            <input name="message" id="btn-input" type="text" class="form-control input-sm"
+                                   placeholder="Type your message here..." required/>
+                            <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btn-chat">
+                                Send</button>
+                        </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        var totalMessages = 0;
+        var matchId = '{{ match.id }}';
+        var interval = 1000; // 1000 = 1 second
+        function updateScroll() {
+            var element = document.getElementById("chat");
+            element.scrollTop = element.scrollHeight;
+        }
+        function updateMessages() {
+            totalMessages = $('#chat > ul li').length;
+            $.ajax({
+                type: 'POST',
+                url: '/messages',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({
+                    messageNumber: totalMessages,
+                    match: matchId
+                }),
+                complete: function (data) {
+                    console.log(matchId);
+                    $('#chat > ul').append(data.responseText);
+                    updateScroll();
+                    setTimeout(updateMessages, interval);
+                }
+            });
+        }
+        updateScroll();
+        setTimeout(updateMessages, interval);
+    </script>
+{% endblock %}
