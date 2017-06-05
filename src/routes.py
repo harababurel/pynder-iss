@@ -68,6 +68,19 @@ def login():
             return render_template('login.html')
 
 
+@app.route("/settings", methods=['GET', 'POST'])
+def settings():
+    pynder_session = src.db_util.load_pynder_session(session['username'])
+    profile = Profile(pynder_session._api.profile(), pynder_session._api)
+    form = SettingsForm(request.form)
+    if request.method == 'POST' and form.validate():
+        form.set_profile_from_fields(profile)
+    else:
+        pass
+    form.set_fields_from_profile(profile)
+    return render_template("settings.html", session=session, form=form)
+
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
