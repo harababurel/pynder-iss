@@ -33,12 +33,17 @@ def matches():
 @app.route("/swipe")
 def swipe():
     pynder_session = db_util.load_pynder_session(session['username'])
-    current_person = next(pynder_session.nearby_users())
+    try:
+        current_person = next(pynder_session.nearby_users())
 
-    hopeful = Hopeful(current_person)
-    db_util.add_hopeful(hopeful)
+    except Exception as e:
 
-    return render_template("swipe.html", session=session, person=current_person, person_hash_code=hopeful.hash_code)
+        return render_template("base.html", error="No people nearby. %s" % e)
+
+    else:
+        hopeful = Hopeful(current_person)
+        db_util.add_hopeful(hopeful)
+        return render_template("swipe.html", session=session, person=current_person, person_hash_code=hopeful.hash_code)
 
 
 @app.route("/vote", methods=['POST'])
