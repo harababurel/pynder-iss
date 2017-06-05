@@ -1,5 +1,7 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
+from flask import request, session, g, escape, render_template, abort, redirect, url_for
+from pynder.models import Profile
 
+from form_util import SettingsForm
 from main import app
 from config import config
 from fb_auth import get_access_token
@@ -111,6 +113,19 @@ def login():
             return redirect(url_for('index'))
         else:
             return render_template('login.html')
+
+
+@app.route("/settings", methods=['GET', 'POST'])
+def settings():
+    pynder_session = db_util.load_pynder_session(session['username'])
+    profile = Profile(pynder_session._api.profile(), pynder_session._api)
+    form = SettingsForm(request.form)
+    if request.method == 'POST' and form.validate():
+        form.set_profile_from_fields(profile)
+    else:
+        pass
+    form.set_fields_from_profile(profile)
+    return render_template("settings.html", session=session, form=form)
 
 
 @app.route('/logout')
