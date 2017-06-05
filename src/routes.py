@@ -1,5 +1,7 @@
 from flask import request, session, g, escape, render_template, abort, redirect, url_for
+from pynder.models import Profile
 
+from src.form_util import SettingsForm
 from src.main import app
 from src.config import config
 from src.fb_auth import get_access_token
