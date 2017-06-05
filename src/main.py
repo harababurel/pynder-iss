@@ -7,7 +7,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 
-from src.config import config
+from config import config
 
 app = Flask(__name__)
 app.debug = config['debug']
@@ -20,9 +20,8 @@ for app_setting in config['app'].items():
 
 db = SQLAlchemy(app)
 
-from src.db_util import *
-from src.routes import *
-from src.models import User
+from db_util import *
+from routes import *
 
 
 def main():

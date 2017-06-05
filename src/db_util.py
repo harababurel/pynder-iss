@@ -1,5 +1,5 @@
-from src.main import db
-from src.models import User
+from main import db
+from models import User
 from sqlalchemy import exists
 import pynder
 import pickle
