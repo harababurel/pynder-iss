@@ -1,6 +1,8 @@
 from main import db
 from flask_login import UserMixin
 
+import pickle
+
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -20,3 +22,16 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.username
+
+class Hopeful(db.Model):
+    __tablename__ = 'hopefuls'
+
+    hash_code = db.Column(db.BigInteger, primary_key=True)
+    pickled = db.Column(db.Binary)
+
+    def __init__(self, hopeful):
+        self.pickled = pickle.dumps(hopeful)
+        self.hash_code = hopeful.__hash__()
+
+    def __repr__(self):
+        return "<Hopeful %i>" % self.hash_code

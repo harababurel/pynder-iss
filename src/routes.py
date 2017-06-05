@@ -5,7 +5,9 @@ from config import config
 from fb_auth import get_access_token
 import itertools
 import db_util
+import pickle
 
+from models import Hopeful
 
 @app.route("/")
 def index():
@@ -32,7 +34,23 @@ def swipe():
     pynder_session = db_util.load_pynder_session(session['username'])
     current_person = next(pynder_session.nearby_users())
 
-    return render_template("swipe.html", session=session, person=current_person)
+    hopeful = Hopeful(current_person)
+    db_util.add_hopeful(hopeful)
+
+    return render_template("swipe.html", session=session, person=current_person, person_hash_code=hopeful.hash_code)
+
+@app.route("/vote", methods=['POST'])
+def vote():
+    hash_code = int(request.form['person_hash_code'])
+
+    hopeful = db_util.get_hopeful(hash_code)
+    vote = None
+
+    for x in ["left", "right", "super"]:
+        if x in request.form:
+            vote = x
+
+    return vote
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -51,7 +69,7 @@ def login():
                 db_util.update_user(username, access_token)
             else:
                 print("user does not exist; creating new")
-                db_util.create_user(username, access_token)
+                db_util.add_user(username, access_token)
 
             session['username'] = username
             # session['access_token'] = access_token

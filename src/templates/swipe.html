@@ -29,13 +29,14 @@
               <div class="container-fluid">
                 <form action="/vote" method="POST">
                   <div class="btn-group btn-group-lg" role="group" aria-label="Left/Superlike/Right">
-                    <button type="submit" class="btn btn-danger" name="no">
+                    <input type="hidden" name="person_hash_code" value="{{ person_hash_code }}">
+                    <button type="submit" class="btn btn-danger" name="left">
                       <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
                     </button>
                     <button type="submit" class="btn btn-primary" name="super">
                       <i class="fa" aria-hidden="true">SuperLike</i>
                     </button>
-                    <button type="submit" class="btn btn-success" name="yes">
+                    <button type="submit" class="btn btn-success" name="right">
                       <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
                     </button>
                   </div>
