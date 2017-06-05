@@ -34,7 +34,7 @@ def get_user(username):
 
 def get_hopeful(hash_code):
     if hopeful_exists(hash_code):
-        return db.session.query(Hopeful).filter(Hopeful.hash_code == hash_code)[0]
+        return pickle.loads(db.session.query(Hopeful).filter(Hopeful.hash_code == hash_code)[0].pickled)
     else:
         print("hopeful with hash=%i doesn't exist. can't retrieve" % hash_code)
         return None

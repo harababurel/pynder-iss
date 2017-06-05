@@ -1,4 +1,4 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
 
 from main import app
 from config import config
@@ -8,6 +8,7 @@ import db_util
 import pickle
 
 from models import Hopeful
+
 
 @app.route("/")
 def index():
@@ -39,6 +40,7 @@ def swipe():
 
     return render_template("swipe.html", session=session, person=current_person, person_hash_code=hopeful.hash_code)
 
+
 @app.route("/vote", methods=['POST'])
 def vote():
     hash_code = int(request.form['person_hash_code'])
@@ -46,11 +48,36 @@ def vote():
     hopeful = db_util.get_hopeful(hash_code)
     vote = None
 
-    for x in ["left", "right", "super"]:
+    for x in ["dislike", "like", "superlike"]:
         if x in request.form:
             vote = x
 
-    return vote
+    print("voted: %s" % vote)
+
+    if vote is None:
+        print("Vote is None")
+        return redirect(url_for('index'), error="vote was None")
+
+    if vote == 'dislike':
+        hopeful.dislike()
+        match = False
+    elif vote == 'like':
+        match = hopeful.like()
+    else:
+        match = hopeful.superlike()
+
+    print("match = %r" % match)
+
+    if match is not False:
+        message = "You have got a new match!"
+        if match['is_super_like']:
+            message += " %s superliked you :)" % hopeful.name
+
+        flash(message)
+        # return render_template('new_match.html', person=hopeful, match=match)
+        return redirect(url_for('swipe'))
+    else:
+        return redirect(url_for('swipe'))
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -30,13 +30,13 @@
                 <form action="/vote" method="POST">
                   <div class="btn-group btn-group-lg" role="group" aria-label="Left/Superlike/Right">
                     <input type="hidden" name="person_hash_code" value="{{ person_hash_code }}">
-                    <button type="submit" class="btn btn-danger" name="left">
+                    <button type="submit" class="btn btn-danger" name="dislike">
                       <i class="fa fa-thumbs-o-down" aria-hidden="true"></i>
                     </button>
-                    <button type="submit" class="btn btn-primary" name="super">
+                    <button type="submit" class="btn btn-primary" name="superlike">
                       <i class="fa" aria-hidden="true">SuperLike</i>
                     </button>
-                    <button type="submit" class="btn btn-success" name="right">
+                    <button type="submit" class="btn btn-success" name="like">
                       <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
                     </button>
                   </div>
