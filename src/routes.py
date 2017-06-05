@@ -11,18 +11,24 @@ import pickle
 
 from models import Hopeful
 
+def preporcess_login():
+    if 'username' in session:
+        return None
+    return render_template('index.html')
 
 @app.route("/")
 def index():
-    if 'username' in session:
-
-        return redirect(url_for('matches'))
-    else:
-        return render_template('index.html')
+    result = preporcess_login()
+    if result is not None:
+        return result
+    return redirect(url_for('matches'))
 
 
 @app.route("/matches")
 def matches():
+    result = preporcess_login()
+    if result is not None:
+        return result
     pynder_session = db_util.load_pynder_session(session['username'])
     current_matches = list(itertools.islice(
         pynder_session.matches(), 0, config['max_matches_shown']))
@@ -34,6 +40,9 @@ def matches():
 
 @app.route("/swipe")
 def swipe():
+    result = preporcess_login()
+    if result is not None:
+        return result
     pynder_session = db_util.load_pynder_session(session['username'])
     current_person = next(pynder_session.nearby_users())
 
@@ -45,6 +54,9 @@ def swipe():
 
 @app.route("/vote", methods=['POST'])
 def vote():
+    result = preporcess_login()
+    if result is not None:
+        return result
     hash_code = int(request.form['person_hash_code'])
 
     hopeful = db_util.get_hopeful(hash_code)
@@ -130,6 +142,9 @@ def settings():
 
 @app.route('/logout')
 def logout():
+    result = preporcess_login()
+    if result is not None:
+        return result
     session.pop('username', None)
     # session.pop('access_token', None)
     return redirect(url_for('index'))

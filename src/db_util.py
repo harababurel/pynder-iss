@@ -66,7 +66,7 @@ def user_has_pynder_session(username):
 
 def dump_pynder_session(username, pynder_session):
     if not user_exists(username):
-        create_user(username)
+        add_user(username)
 
     get_user(username).set_pynder_session(pynder_session)
     print("dumped pynder session to db")
@@ -74,7 +74,7 @@ def dump_pynder_session(username, pynder_session):
 
 def load_pynder_session(username):
     if not user_exists(username):
-        create_user(username)
+        add_user(username)
 
     user = get_user(username)
 
