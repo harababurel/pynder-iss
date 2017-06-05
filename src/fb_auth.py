@@ -2,7 +2,7 @@ import re
 import requests
 import robobrowser
 
-from config import config
+from src.config import config
 
 
 def get_access_token(email, password):

@@ -1,10 +1,10 @@
 from flask import request, session, g, escape, render_template, abort, redirect, url_for
 
-from main import app
-from config import config
-from fb_auth import get_access_token
+from src.main import app
+from src.config import config
+from src.fb_auth import get_access_token
 import itertools
-import db_util
+import src.db_util
 
 
 @app.route("/")
@@ -18,7 +18,7 @@ def index():
 
 @app.route("/matches")
 def matches():
-    pynder_session = db_util.load_pynder_session(session['username'])
+    pynder_session = src.db_util.load_pynder_session(session['username'])
     current_matches = list(itertools.islice(
         pynder_session.matches(), 0, config['max_matches_shown']))
 
@@ -29,7 +29,7 @@ def matches():
 
 @app.route("/swipe")
 def swipe():
-    pynder_session = db_util.load_pynder_session(session['username'])
+    pynder_session = src.db_util.load_pynder_session(session['username'])
     current_person = next(pynder_session.nearby_users())
 
     return render_template("swipe.html", session=session, person=current_person)
@@ -46,12 +46,12 @@ def login():
 
             print("access token is %s" % access_token)
 
-            if db_util.user_exists(username):
+            if src.db_util.user_exists(username):
                 print("user exists; updating access token")
-                db_util.update_user(username, access_token)
+                src.db_util.update_user(username, access_token)
             else:
                 print("user does not exist; creating new")
-                db_util.create_user(username, access_token)
+                src.db_util.create_user(username, access_token)
 
             session['username'] = username
             # session['access_token'] = access_token
