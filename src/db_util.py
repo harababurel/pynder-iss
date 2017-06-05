@@ -1,5 +1,5 @@
 from main import db
-from models import User
+from models import User, Hopeful
 from sqlalchemy import exists
 import pynder
 import pickle
@@ -9,9 +9,19 @@ def user_exists(username):
     return db.session.query(exists().where(User.username == username)).scalar()
 
 
-def create_user(username, access_token=None, pynder_session=None):
+def hopeful_exists(hash_code):
+    return db.session.query(exists().where(Hopeful.hash_code == hash_code)).scalar()
+
+
+def add_user(username, access_token=None, pynder_session=None):
     db.session.add(User(username, access_token, pynder_session))
     db.session.commit()
+
+
+def add_hopeful(hopeful):
+    if not hopeful_exists(hopeful.hash_code):
+        db.session.add(hopeful)
+        db.session.commit()
 
 
 def get_user(username):
@@ -19,6 +29,14 @@ def get_user(username):
         return db.session.query(User).filter(User.username == username)[0]
     else:
         print("user doesn't exist. can't retrieve")
+        return None
+
+
+def get_hopeful(hash_code):
+    if hopeful_exists(hash_code):
+        return pickle.loads(db.session.query(Hopeful).filter(Hopeful.hash_code == hash_code)[0].pickled)
+    else:
+        print("hopeful with hash=%i doesn't exist. can't retrieve" % hash_code)
         return None
 
 
