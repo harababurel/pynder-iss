@@ -1,4 +1,4 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
 from pynder.models import Profile
 
 from form_util import SettingsForm
