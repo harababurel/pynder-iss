@@ -167,14 +167,12 @@ def settings():
 
     form = SettingsForm(request.form)
     if request.method == 'POST' and form.validate():
-        data = dict([(a, getattr(form, a).data) for a in dir(
-            form) if not a.startswith("__") and hasattr(getattr(form, a), 'data')])
-        pretty_data = pformat(data, indent=2).replace("\n", "<br>")
-        return pretty_data
+        # data = dict([(a, getattr(form, a).data) for a in dir(
+        #     form) if not a.startswith("__") and hasattr(getattr(form, a), 'data')])
+        # pretty_data = pformat(data, indent=2).replace("\n", "<br>")
+        # return pretty_data
 
-        # form.update_profile_from_fields(pynder_session)
-    else:
-        pass
+        form.update_profile_from_fields(pynder_session)
 
     form.fill_fields_from_profile(pynder_session)
     return render_template("settings.html", session=session, form=form)

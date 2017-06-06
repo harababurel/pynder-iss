@@ -55,7 +55,6 @@
               </div>
             </li>
 
-
             <li class="list-group-item">
               <div class="form-inline row">
                 <div class="col-md-4">
@@ -64,14 +63,13 @@
                 <div class="col-md-8">
                   <h4>
                     <select class="form-control" id="gender" name="gender">
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
+                      <option value="male" {% if form.gender.data == 'male' %}selected{% endif %}>Male</option>
+                      <option value="female" {% if form.gender.data == 'female' %}selected{% endif %}>Female</option>
                     </select>
                   </h4>
                 </div>
               </div>
             </li>
-
 
             <li class="list-group-item">
               <div class="form-inline row">
@@ -82,8 +80,8 @@
                 <div class="col-md-8">
                   <h4>
                     <select class="form-control" id="gender_filter" name="gender_filter">
-                      <option value="male">Men</option>
-                      <option value="female">Women</option>
+                      <option value="male" {% if form.gender_filter.data == 'male' %}selected{% endif %}>Men</option>
+                      <option value="female" {% if form.gender_filter.data == 'female' %}selected{% endif %}>Women</option>
                     </select>
                   </h4>
                 </div>
@@ -99,8 +97,8 @@
                 <div class="col-md-8">
                   <h4>
                     <select class="form-control" id="discoverable" name="discoverable">
-                      <option value="y">Yes</option>
-                      <option value="">No</option>
+                      <option value="y" {% if form.discoverable == True %}selected{% endif %}>Yes</option>
+                      <option value="" {% if form.discoverable == False %}selected{% endif %}>No</option>
                     </select>
                   </h4>
                 </div>
@@ -115,7 +113,7 @@
 
                 <div class="col-md-8">
                   <h4>
-                    <textarea class="form-control" id="bio" name="bio" rows="3" cols="30"></textarea>
+                    <textarea class="form-control" id="bio" name="bio" rows="3" cols="30">{{ form.bio.data }}</textarea>
                   </h4>
                 </div>
               </div>
@@ -123,7 +121,11 @@
 
 
             <li class="list-group-item">
-              <button type="submit" class="btn btn-danger col-md-12">Submit</button>
+              <div class="form-inline row">
+                <div class="col-md-1"></div>
+                <button type="submit" class="btn btn-danger col-md-10" style="padding: 10px 10px 10px 10px;">Submit</button>
+                <div class="col-md-1"></div>
+              </div>
             </li>
 
           </ul>
@@ -145,7 +147,7 @@
     var slider2 = new Slider('#distance_slider', {
       tooltip: 'always',
       formatter: function(value) {
-        return value + ' km';
+        return value + ' miles';
       }
     });
   </script>
