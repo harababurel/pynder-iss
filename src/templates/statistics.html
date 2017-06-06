@@ -21,6 +21,9 @@
         <hr>
         <canvas id="age-distribution-chart" width="800" height="450"></canvas>
 
+        <hr>
+        <canvas id="distance-distribution-chart" width="800" height="450"></canvas>
+
 
       </div>
     </div>
@@ -30,63 +33,97 @@
 </div>
 
 <script>
-  new Chart(document.getElementById("gender-distribution-chart"), {
-      type: 'doughnut',
-      data: {
-        labels: ["Male", "Female"],
-        datasets: [
-          {
-            label: "Total count",
-            backgroundColor: ["#3e95cd", "#c45850"],
-            data: [{{ data['male']['count'] }}, {{ data['female']['count'] }}]
-          }
-        ]
-      },
-      options: {
-        title: {
-          display: true,
-          text: 'Gender distribution of all persons swiped on'
-        }
+new Chart(document.getElementById("gender-distribution-chart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Male", "Female"],
+    datasets: [
+      {
+        label: "Total count",
+        backgroundColor: ["#3e95cd", "#c45850"],
+        data: [{{ data['male']['count'] }}, {{ data['female']['count'] }}]
       }
-  });
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Gender distribution of all persons swiped on'
+    }
+  }
+});
 </script>
 
 
 <script>
-  new Chart(document.getElementById("age-distribution-chart"), {
-    type: 'line',
-    data: {
-      labels: {{ data['ages'] }},
-      datasets: [{
-          data: [
-            {% for x in data['male']['age'].items() | sort %}
-              { x: {{ x[0] }}, y: {{ x[1] }} },
-            {% endfor %}
-          ],
-          label: "Male",
-          borderColor: "#3e95cd",
-          fill: false
-        }, {
-          data: [
-            {% for x in data['female']['age'].items() | sort %}
-              { x: {{ x[0] }}, y: {{ x[1] }} },
-            {% endfor %}
-          ],
-          label: "Female",
-          borderColor: "#c45850",
-          fill: false
-        }
-      ]
-    },
-    options: {
-      title: {
-        display: true,
-        text: 'Age distribution per gender'
-      }
+new Chart(document.getElementById("age-distribution-chart"), {
+  type: 'line',
+  data: {
+    labels: {{ data['ages'] }},
+    datasets: [{
+      data: [
+        {% for x in data['male']['age'].items() | sort %}
+        { x: {{ x[0] }}, y: {{ x[1] }} },
+        {% endfor %}
+      ],
+      label: "Male",
+      borderColor: "#3e95cd",
+      fill: false
+    }, {
+      data: [
+        {% for x in data['female']['age'].items() | sort %}
+        { x: {{ x[0] }}, y: {{ x[1] }} },
+        {% endfor %}
+      ],
+      label: "Female",
+      borderColor: "#c45850",
+      fill: false
     }
-  });
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Age distribution per gender'
+    }
+  }
+});
 </script>
 
+<script>
+new Chart(document.getElementById("distance-distribution-chart"), {
+  type: 'line',
+  data: {
+    labels: {{ data['distances'] }},
+    datasets: [{
+      data: [
+        {% for x in data['male']['distance'].items() | sort %}
+        { x: {{ x[0] }}, y: {{ x[1] }} },
+        {% endfor %}
+      ],
+      label: "Male",
+      borderColor: "#3e95cd",
+      fill: false
+    }, {
+      data: [
+        {% for x in data['female']['distance'].items() | sort %}
+        { x: {{ x[0] }}, y: {{ x[1] }} },
+        {% endfor %}
+      ],
+      label: "Female",
+      borderColor: "#c45850",
+      fill: false
+    }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Distance distribution per gender (km)'
+    }
+  }
+});
+</script>
 
 
 
