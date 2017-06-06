@@ -3,3 +3,4 @@
 p3env
 **/*.pyc
 **/*.swp
+node_modules

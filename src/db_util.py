@@ -55,6 +55,11 @@ def get_hopeful(hash_code):
         return None
 
 
+def get_all_hopefuls():
+    for hopeful in db.session.query(Hopeful).all():
+        yield pickle.loads(hopeful.pickled)
+
+
 def delete_user(username):
     if user_exists(username):
         get_user(username).delete()
@@ -76,7 +81,7 @@ def user_has_access_token(username):
 
 
 def user_has_pynder_session(username):
-    return get_user(username).pynder_session is not None
+    return len(get_user(username).pynder_session) > 0
 
 
 def dump_pynder_session(username, pynder_session):
