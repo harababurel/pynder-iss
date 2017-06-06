@@ -14,7 +14,7 @@ import pickle
 from models import Hopeful, TinderUser, Vote, Match
 
 
-def preporcess_login():
+def preprocess_login():
     if 'username' in session:
         return None
     return render_template('index.html')
@@ -22,7 +22,7 @@ def preporcess_login():
 
 @app.route("/")
 def index():
-    result = preporcess_login()
+    result = preprocess_login()
     if result is not None:
         return result
     return redirect(url_for('matches'))
@@ -30,7 +30,7 @@ def index():
 
 @app.route("/matches")
 def matches():
-    result = preporcess_login()
+    result = preprocess_login()
     if result is not None:
         return result
     pynder_session = db_util.load_pynder_session(session['username'])
@@ -44,7 +44,7 @@ def matches():
 
 @app.route("/swipe")
 def swipe():
-    result = preporcess_login()
+    result = preprocess_login()
     if result is not None:
         return result
     pynder_session = db_util.load_pynder_session(session['username'])
@@ -61,7 +61,7 @@ def swipe():
 
 @app.route("/vote", methods=['POST'])
 def vote():
-    result = preporcess_login()
+    result = preprocess_login()
     if result is not None:
         return result
 
@@ -196,7 +196,7 @@ def settings():
 
 @app.route('/logout')
 def logout():
-    result = preporcess_login()
+    result = preprocess_login()
     if result is not None:
         return result
     session.pop('username', None)
