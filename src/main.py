@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
-import flask_sqlalchemy
-
 from flask import Flask
-from flask_login import login_required, login_user, logout_user, current_user
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_sqlalchemy import SQLAlchemy
 
@@ -22,6 +19,7 @@ db = SQLAlchemy(app)
 
 from db_util import *
 from routes import *
+
 
 def main():
     try:

@@ -1,5 +1,3 @@
-from pynder.constants import GENDER_MAP, GENDER_MAP_REVERSE
-from pynder.models.me import ProfileDescriptor
 from wtforms import Form, BooleanField, IntegerField, RadioField, \
     SelectMultipleField, validators, TextAreaField, widgets
 

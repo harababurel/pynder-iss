@@ -1,5 +1,5 @@
 from main import db
-from models import User, Hopeful, TinderUser, Photo, School, Vote, Match
+from models import User, Hopeful, TinderUser, Vote, Match
 from sqlalchemy import exists, or_
 import pynder
 import pickle
@@ -16,8 +16,8 @@ def add_tinder_user(tinder_user):
     db.session.commit()
 
 
-def get_tinder_user(id):
-    return db.session.query(TinderUser).filter(TinderUser.id == id).first()
+def get_tinder_user(user_id):
+    return db.session.query(TinderUser).filter(TinderUser.id == user_id).first()
 
 
 def user_exists(username):
@@ -123,13 +123,14 @@ def add(entity):
 
 
 def vote_exists(vote):
-    return db.session.query(exists().where(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id)).scalar()
+    return db.session.query(exists().where(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id)).\
+        scalar()
 
 
 def match_exists(person1_id, person2_id):
     result = db.session.query(exists()
-                            .where(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
-                                       (Match.person2_id == person1_id and Match.person1_id == person2_id)))).scalar()
+                              .where(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
+                                         (Match.person2_id == person1_id and Match.person1_id == person2_id)))).scalar()
     return result
 
 
@@ -139,7 +140,8 @@ def get_vote(vote):
 
 def get_match(person1_id, person2_id):
     return db.session.query(Match).filter(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
-                                       (Match.person2_id == person1_id and Match.person1_id == person2_id))).first()
+                                              (Match.person2_id == person1_id and Match.person1_id == person2_id))).\
+        first()
 
 
 def set_message_count(person1_id, person2_id, message_count):

@@ -1,6 +1,4 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash, jsonify
-from pynder.models import Profile
-from collections import defaultdict
+from flask import request, session, render_template, redirect, url_for, flash, jsonify
 from pprint import pformat
 
 from form_util import SettingsForm
@@ -9,15 +7,13 @@ from config import config
 from fb_auth import get_access_token
 import itertools
 import db_util
-import pickle
 
-from models import Hopeful, TinderUser, Vote, Match
+from models import Hopeful, TinderUser, Match
 from statistics import generate_age_statistics
 
 
 def logged_in():
     return 'username' in session
-
 
 
 @app.route("/")
@@ -27,13 +23,13 @@ def index():
     return redirect(url_for('matches'))
 
 
-@app.route("/chat/<id>", methods=['POST'])
-def chat(id):
+@app.route("/chat/<user_id>", methods=['POST'])
+def chat(user_id):
     pynder_session = db_util.load_pynder_session(session['username'])
     current_match = None
     for match in list(itertools.islice(
-        pynder_session.matches(), 0, config['max_matches_shown'])):
-        if match.user.id == id:
+            pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.user.id == user_id:
             current_match = match
     message = request.form['message']
     current_match.message(message)
@@ -220,16 +216,16 @@ def messages():
             db_util.add(Match(pynder_session.profile.id, current_match.user.id))
         else:
             seen_messages = db_util.get_message_count(pynder_session.profile.id, current_match.user.id)
-        messageList = current_match.messages
+        message_list = current_match.messages
         if request.json['active']:
             if int(request.json['messageNumber']) == 0:
-                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
-            if len(messageList) > seen_messages:
-                messageList = messageList[int(request.json['messageNumber']):]
-                db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(messageList))
-                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+                return render_template("messages.html", messages=message_list, user=pynder_session.profile)
+            if len(message_list) > seen_messages:
+                message_list = message_list[int(request.json['messageNumber']):]
+                db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
+                return render_template("messages.html", messages=message_list, user=pynder_session.profile)
         else:
-            if len(messageList) > seen_messages:
+            if len(message_list) > seen_messages:
                 return jsonify("1")
     return ""
 

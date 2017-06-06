@@ -1,7 +1,4 @@
-import dateutil
-from pynder.constants import SIMPLE_FIELDS
 from sqlalchemy import exists
-from sqlalchemy.ext.declarative import declarative_base
 
 from main import db
 from flask_login import UserMixin
@@ -94,12 +91,11 @@ class TinderUser(db.Model):
                 for photo in data.photos:
                     self.photos.append(Photo(photo, self.id))
 
-
         if hasattr(data, 'jobs'):
             for job in data.jobs:
                 userjob = UserJob()
                 if job_exists(job):
-                    userjob.job= get_job(job)
+                    userjob.job = get_job(job)
                 else:
                     userjob.job = Job(job)
                 self.jobs.append(userjob)
@@ -153,7 +149,6 @@ class Vote(db.Model):
     voter_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     hopeful_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     value = db.Column(db.String(10))
-
 
     def __init__(self, voter, hopeful, value):
         self.voter_id = voter.id

@@ -29,7 +29,6 @@ def generate_age_statistics(hopefuls):
 
     # make sure there are no missing points in the line
 
-
     for gender in ['female', 'male']:
         for age in data['ages']:
             if age not in data[gender]['age']:
