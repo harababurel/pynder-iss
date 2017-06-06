@@ -1,5 +1,5 @@
 from main import db
-from models import User, Hopeful, TinderUser, Photo, School
+from models import User, Hopeful, TinderUser, Photo, School, Vote, Match
 from sqlalchemy import exists
 import pynder
 import pickle
@@ -8,10 +8,17 @@ import pickle
 def tinder_user_exist(tinder_user):
     return db.session.query(exists().where(TinderUser.id == tinder_user.id)).scalar()
 
+
 def add_tinder_user(tinder_user):
     if tinder_user_exist(tinder_user):
         pass
     db.session.add(tinder_user)
+    db.session.commit()
+
+
+def get_tinder_user(id):
+    return db.session.query(TinderUser).filter(TinderUser.id == id).first()
+
 
 
 def user_exists(username):
@@ -103,4 +110,37 @@ def load_pynder_session(username):
 def create_pynder_session(fb_token, fb_id=None):
     pynder_session = pynder.Session(facebook_id=fb_id, facebook_token=fb_token)
     return pynder_session
+
+
+def add_vote(vote):
+    db.session.add(vote)
+    db.session.commit()
+
+
+def add_match(match):
+    db.session.add(match)
+    db.session.commit()
+
+
+def vote_exist(vote):
+    return db.session.query(exists().where(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id)).scalar()
+
+
+def match_exist(match):
+    return db.session.query(exists()
+                            .where((Match.person1_id == match.person1_id and Match.person2_id == match.person2_id) or
+                                   (Match.person2_id == match.person1_id and Match.person1_id == match.person2_id))).scalar()
+
+def get_vote(vote):
+    return db.session.query(Vote).filter(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id).first()
+
+
+def get_match(match):
+    return db.session.query(Match).filter((Match.person1_id == match.person1_id and Match.person2_id == match.person2_id) or
+                                   (Match.person2_id == match.person1_id and Match.person1_id == match.person2_id)).first()
+
+def update_vote(vote):
+    if not vote_exist(vote):
+        pass
+    get_vote(vote).value = vote.value
 

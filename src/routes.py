@@ -9,7 +9,7 @@ import itertools
 import db_util
 import pickle
 
-from models import Hopeful, TinderUser
+from models import Hopeful, TinderUser, Vote, Match
 
 
 def preporcess_login():
@@ -58,6 +58,10 @@ def vote():
     result = preporcess_login()
     if result is not None:
         return result
+
+    access_token = db_util.load_pynder_session(session["username"])
+    profile = Profile(access_token._api.profile(), access_token._api)
+
     hash_code = int(request.form['person_hash_code'])
 
     hopeful = db_util.get_hopeful(hash_code)
@@ -81,9 +85,12 @@ def vote():
     else:
         match = hopeful.superlike()
 
+    db_util.add_vote(Vote(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id), vote))
+
     print("match = %r" % match)
 
     if match is not False:
+        db_util.add_match(Match(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id)))
         message = "You have got a new match!"
         if match['is_super_like']:
             message += " %s superliked you :)" % hopeful.name
@@ -115,6 +122,10 @@ def login():
 
             session['username'] = username
             # session['access_token'] = access_token
+
+            access_token = db_util.load_pynder_session(username)
+            profile = Profile(access_token._api.profile(), access_token._api)
+            db_util.add_tinder_user(TinderUser(profile))
 
             return redirect(url_for('index'))
 
