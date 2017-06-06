@@ -164,10 +164,11 @@
     </div>
     <script src="/static/chat.js"></script>
     <script>
-        $('#unmatch').click(function () {
+        $('#unmatch').click(function (e) {
+            let id = $(this).closest('.collapse').attr('id');
             $.ajax({
                 type: 'POST',
-                url: '/unmach/' + activeChat.matchId,
+                url: '/unmatch/' + id,
                 success: function (data) {
                     location.reload();
                 }

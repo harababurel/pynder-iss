@@ -242,6 +242,7 @@ def unmatch(id):
         if match.user.id == id:
             current_match = match
     current_match.delete()
+    return ""
 
 
 @app.errorhandler(404)
