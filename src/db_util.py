@@ -81,7 +81,8 @@ def user_has_access_token(username):
 
 
 def user_has_pynder_session(username):
-    return len(get_user(username).pynder_session) > 0
+    pynder_session = get_user(username).pynder_session
+    return pynder_session is not None and len(get_user(username).pynder_session) > 0
 
 
 def dump_pynder_session(username, pynder_session):

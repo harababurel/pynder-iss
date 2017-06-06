@@ -50,7 +50,7 @@ def swipe():
     pynder_session = db_util.load_pynder_session(session['username'])
     try:
         current_person = next(pynder_session.nearby_users())
-		db_util.add_tinder_user(TinderUser(current_person))
+        db_util.add_tinder_user(TinderUser(current_person))
     except Exception as e:
         return render_template("base.html", error="No people nearby. %s" % e)
     else:
