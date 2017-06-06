@@ -225,8 +225,8 @@ def messages():
             if int(request.json['messageNumber']) == 0:
                 return render_template("messages.html", messages=messageList, user=pynder_session.profile)
             if len(messageList) > seen_messages:
-                messageList = messageList[int(request.json['messageNumber']):]
                 db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(messageList))
+                messageList = messageList[int(request.json['messageNumber']):]
                 return render_template("messages.html", messages=messageList, user=pynder_session.profile)
         else:
             if len(messageList) > seen_messages:
