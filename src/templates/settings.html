@@ -4,25 +4,164 @@
 <br>
 <div class="row">
   <div class="col-md-3"></div>
-    <div class="col-md-6">
-      <div class="form-box">
-          {% from "_formhelpers.html" import render_field %}
-          <form action="/settings" method="post">
-            <dl>
-                {{ render_field(form.age_min) }}
-                {{ render_field(form.age_max) }}
-                {{ render_field(form.gender) }}
-{#                {{ render_field(form.interested_in) }}#}
-                {{ render_field(form.bio) }}
-                {{ render_field(form.discoverable) }}
-                {{ render_field(form.distance_filter) }}
-            </dl>
-              <p><input type=submit value=Update>
-          </form>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Settings</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ url_for('settings') }}" method="post">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Age interval</span></h3>
+                </div>
+                <input id="age_min" name="age_min" type="hidden" value="{{ form.age_min.data }}">
+                <input id="age_max" name="age_max" type="hidden" value="{{ form.age_max.data }}">
+
+                <div class="col-md-8" style="padding-top: 10px;">
+                  <h3>
+                  <input id="age_slider" type="text" class="col-md-8" value=""
+                         data-slider-min="18"
+                         data-slider-max="100"
+                         data-slider-step="1"
+                         data-slider-value="[{{ form.age_min.data }}, {{ form.age_max.data }}]"
+                         onchange="copyValue();"/>
+                  </h3>
+                </div>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Distance</span></h3>
+                </div>
+                <input id="age_max" name="age_max" type="hidden" value="{{ form.age_max.data }}">
+
+                <div class="col-md-8" style="padding-top: 10px;">
+                  <h3>
+                    <input type="hidden" id="distance_filter" name="distance_filter" value="{{ form.distance_filter.data }}">
+                    <input id="distance_slider"
+                           type="text"
+                           data-slider-min="1"
+                           data-slider-max="100"
+                           data-slider-step="1"
+                           data-slider-value="{{ form.distance_filter.data }}"
+                           onchange="copyValue();"/>
+                  </h3>
+                </div>
+              </div>
+            </li>
+
+
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Gender</span></h3>
+                </div>
+                <div class="col-md-8">
+                  <h4>
+                    <select class="form-control" id="gender" name="gender">
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </select>
+                  </h4>
+                </div>
+              </div>
+            </li>
+
+
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Interested in</span></h3>
+                </div>
+
+                <div class="col-md-8">
+                  <h4>
+                    <select class="form-control" id="gender_filter" name="gender_filter">
+                      <option value="male">Men</option>
+                      <option value="female">Women</option>
+                    </select>
+                  </h4>
+                </div>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Discoverable</span></h3>
+                </div>
+
+                <div class="col-md-8">
+                  <h4>
+                    <select class="form-control" id="discoverable" name="discoverable">
+                      <option value="y">Yes</option>
+                      <option value="">No</option>
+                    </select>
+                  </h4>
+                </div>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <div class="form-inline row">
+                <div class="col-md-4">
+                  <h3><span class="label label-danger">Bio</span></h3>
+                </div>
+
+                <div class="col-md-8">
+                  <h4>
+                    <textarea class="form-control" id="bio" name="bio" rows="3" cols="30"></textarea>
+                  </h4>
+                </div>
+              </div>
+            </li>
+
+
+            <li class="list-group-item">
+              <button type="submit" class="btn btn-danger col-md-12">Submit</button>
+            </li>
+
+          </ul>
+        </form>
       </div>
     </div>
-    <div class="col-md-3"></div>
+  </div>
   <div class="col-md-3"></div>
 </div>
+
+  <script>
+    var slider = new Slider('#age_slider', {
+      tooltip: 'always',
+      formatter: function(value) {
+        return 'Between ' + value[0] + ' and ' + value[1];
+      }
+
+    });
+    var slider2 = new Slider('#distance_slider', {
+      tooltip: 'always',
+      formatter: function(value) {
+        return value + ' km';
+      }
+    });
+  </script>
+
+  <script type="text/javascript">
+    function copyValue() {
+      var age_interval = document.getElementById("age_slider").value.split(',');
+      var age_min = age_interval[0];
+      var age_max = age_interval[1];
+
+      var distance_filter = document.getElementById("distance_slider").value;
+
+      document.getElementById("age_min").value = age_min;
+      document.getElementById("age_max").value = age_max;
+      document.getElementById("distance_filter").value = distance_filter;
+    }
+  </script>
 
 {% endblock %}

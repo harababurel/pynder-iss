@@ -103,11 +103,11 @@ def statistics():
         'male': {
             'count': 0,
             'age': defaultdict(int),
-            },
+        },
         'female': {
             'count': 0,
             'age': defaultdict(int),
-            },
+        },
         'ages': []
     }
 
@@ -120,9 +120,9 @@ def statistics():
     for x in hopefuls:
         data[x.gender]['age'][x.age] += 1
 
-    data['ages'] = [x for x in range(100) \
-            if x in data['male']['age'] \
-            or x in data['female']['age']]
+    data['ages'] = [x for x in range(100)
+                    if x in data['male']['age']
+                    or x in data['female']['age']]
 
     pretty_data = pformat(data, indent=2).replace("\n", "<br>")
     return render_template('statistics.html', data=data, pretty_data=pretty_data)
@@ -164,13 +164,19 @@ def login():
 @app.route("/settings", methods=['GET', 'POST'])
 def settings():
     pynder_session = db_util.load_pynder_session(session['username'])
-    profile = Profile(pynder_session._api.profile(), pynder_session._api)
+
     form = SettingsForm(request.form)
     if request.method == 'POST' and form.validate():
-        form.set_profile_from_fields(profile)
+        data = dict([(a, getattr(form, a).data) for a in dir(
+            form) if not a.startswith("__") and hasattr(getattr(form, a), 'data')])
+        pretty_data = pformat(data, indent=2).replace("\n", "<br>")
+        return pretty_data
+
+        # form.update_profile_from_fields(pynder_session)
     else:
         pass
-    form.set_fields_from_profile(profile)
+
+    form.fill_fields_from_profile(pynder_session)
     return render_template("settings.html", session=session, form=form)
 
 
