@@ -44,7 +44,7 @@ class Hopeful(db.Model):
 
 
 class UserSchool(db.Model):
-    __tablename__ = 'userschool'
+    __tablename__ = 'userschools'
 
     user_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     school_id = db.Column(db.Integer, db.ForeignKey('schools.id'), primary_key=True)
@@ -56,7 +56,7 @@ class UserSchool(db.Model):
 
 
 class UserJob(db.Model):
-    __tablename__ = 'userjob'
+    __tablename__ = 'userjobs'
 
     user_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), primary_key=True)
@@ -95,22 +95,22 @@ class TinderUser(db.Model):
                     self.photos.append(Photo(photo, self.id))
 
 
-            if hasattr(data, 'jobs'):
-                for job in data.jobs:
-                    userjob = UserJob()
-                    if job_exist(job):
-                        userjob.job= get_job(job)
-                    else:
-                        userjob.job = Job(job)
-                    self.jobs.append(userjob)
+        if hasattr(data, 'jobs'):
+            for job in data.jobs:
+                userjob = UserJob()
+                if job_exists(job):
+                    userjob.job= get_job(job)
+                else:
+                    userjob.job = Job(job)
+                self.jobs.append(userjob)
 
-            if hasattr(data, 'school'):
-                for school in data.schools:
-                    userschool = UserSchool()
-                    if school_exist(school):
-                        userschool.school = get_school(school)
-                    else:
-                        userschool.school = School(school)
+        if hasattr(data, 'school'):
+            for school in data.schools:
+                userschool = UserSchool()
+                if school_exists(school):
+                    userschool.school = get_school(school)
+                else:
+                    userschool.school = School(school)
 
                 self.schools.append(userschool)
 
@@ -148,7 +148,7 @@ class School(db.Model):
 
 
 class Vote(db.Model):
-    __tabelname__ = 'votes'
+    __tablename__ = 'votes'
 
     voter_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     hopeful_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
@@ -162,7 +162,7 @@ class Vote(db.Model):
 
 
 class Match(db.Model):
-    __tabelname__ = 'matches'
+    __tablename__ = 'matches'
 
     person1_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     person2_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
@@ -174,7 +174,7 @@ class Match(db.Model):
         self.message_count = 0
 
 
-def school_exist(school):
+def school_exists(school):
     return db.session.query(exists().where(School.name == school)).scalar()
 
 
@@ -182,7 +182,7 @@ def get_school(school):
     return db.session.query(School).filter(School.name == school).first()
 
 
-def job_exist(job):
+def job_exists(job):
     return db.session.query(exists().where(Job.name == job)).scalar()
 
 
