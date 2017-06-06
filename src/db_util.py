@@ -40,6 +40,11 @@ def get_hopeful(hash_code):
         return None
 
 
+def get_all_hopefuls():
+    for hopeful in db.session.query(Hopeful).all():
+        yield pickle.loads(hopeful.pickled)
+
+
 def delete_user(username):
     if user_exists(username):
         get_user(username).delete()

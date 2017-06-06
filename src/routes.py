@@ -1,5 +1,7 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
 from pynder.models import Profile
+from collections import defaultdict
+from pprint import pformat
 
 from form_util import SettingsForm
 from main import app
@@ -11,10 +13,12 @@ import pickle
 
 from models import Hopeful
 
+
 def preporcess_login():
     if 'username' in session:
         return None
     return render_template('index.html')
+
 
 @app.route("/")
 def index():
@@ -91,6 +95,37 @@ def vote():
         return redirect(url_for('swipe'))
     else:
         return redirect(url_for('swipe'))
+
+
+@app.route('/statistics')
+def statistics():
+    data = {
+        'male': {
+            'count': 0,
+            'age': defaultdict(int),
+            },
+        'female': {
+            'count': 0,
+            'age': defaultdict(int),
+            },
+        'ages': []
+    }
+
+    hopefuls = list(db_util.get_all_hopefuls())
+
+    for gender in ['male', 'female']:
+        data[gender]['count'] = len(
+            [x for x in hopefuls if x.gender == gender])
+
+    for x in hopefuls:
+        data[x.gender]['age'][x.age] += 1
+
+    data['ages'] = [x for x in range(100) \
+            if x in data['male']['age'] \
+            or x in data['female']['age']]
+
+    pretty_data = pformat(data, indent=2).replace("\n", "<br>")
+    return render_template('statistics.html', data=data, pretty_data=pretty_data)
 
 
 @app.route('/login', methods=['GET', 'POST'])
