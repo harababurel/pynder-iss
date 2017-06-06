@@ -22,8 +22,6 @@ db = SQLAlchemy(app)
 
 from db_util import *
 from routes import *
-from models import User, Hopeful
-
 
 def main():
     try:

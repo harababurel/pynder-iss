@@ -1,9 +1,7 @@
-from flask import request, session, g, escape, render_template, abort, \
-    redirect, url_for, flash
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
 from pynder.models import Profile
+from collections import defaultdict
 from pprint import pformat
-
-from statistics import *
 
 from form_util import SettingsForm
 from main import app
@@ -13,28 +11,26 @@ import itertools
 import db_util
 import pickle
 
-from models import Hopeful
+from models import Hopeful, TinderUser, Vote, Match
+from statistics import generate_age_statistics
 
 
-def preporcess_login():
-    if 'username' in session:
-        return None
-    return render_template('index.html')
+def logged_in():
+    return 'username' in session
+
 
 
 @app.route("/")
 def index():
-    result = preporcess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
     return redirect(url_for('matches'))
 
 
 @app.route("/matches")
 def matches():
-    result = preporcess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
     pynder_session = db_util.load_pynder_session(session['username'])
     current_matches = list(itertools.islice(
         pynder_session.matches(), 0, config['max_matches_shown']))
@@ -48,9 +44,12 @@ def matches():
 
 @app.route("/swipe")
 def swipe():
+    if not logged_in():
+        return render_template('index.html')
     pynder_session = db_util.load_pynder_session(session['username'])
     try:
         current_person = next(pynder_session.nearby_users())
+        db_util.add_tinder_user(TinderUser(current_person))
     except Exception as e:
         return render_template("base.html",
                                error="No people nearby. %s" % e)
@@ -65,9 +64,11 @@ def swipe():
 
 @app.route("/vote", methods=['POST'])
 def vote():
-    result = preporcess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
+
+    pynder_session = db_util.load_pynder_session(session["username"])
+
     hash_code = int(request.form['person_hash_code'])
 
     hopeful = db_util.get_hopeful(hash_code)
@@ -94,6 +95,7 @@ def vote():
     print("match = %r" % match)
 
     if match is not False:
+        db_util.add(Match(pynder_session.profile.id, hopeful.id))
         message = "You have got a new match!"
         if match['is_super_like']:
             message += " %s superliked you :)" % hopeful.name
@@ -145,6 +147,9 @@ def login():
             session['username'] = username
             # session['access_token'] = access_token
 
+            pynder_session = db_util.load_pynder_session(username)
+            db_util.add_tinder_user(TinderUser(pynder_session.profile))
+
             return redirect(url_for('index'))
 
         except Exception as e:
@@ -152,7 +157,7 @@ def login():
                                    error="Could not get access token. %s" % e)
 
     else:
-        if 'username' in session:
+        if logged_in():
             return redirect(url_for('index'))
         else:
             return render_template('login.html')
@@ -160,6 +165,9 @@ def login():
 
 @app.route("/settings", methods=['GET', 'POST'])
 def settings():
+    if not logged_in():
+        return render_template('index.html')
+
     pynder_session = db_util.load_pynder_session(session['username'])
 
     form = SettingsForm(request.form)
@@ -178,9 +186,9 @@ def settings():
 
 @app.route('/logout')
 def logout():
-    result = preporcess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
+
     session.pop('username', None)
     # session.pop('access_token', None)
     return redirect(url_for('index'))
