@@ -1,8 +1,17 @@
 from main import db
-from models import User, Hopeful
+from models import User, Hopeful, TinderUser, Photo, School
 from sqlalchemy import exists
 import pynder
 import pickle
+
+
+def tinder_user_exist(tinder_user):
+    return db.session.query(exists().where(TinderUser.id == tinder_user.id)).scalar()
+
+def add_tinder_user(tinder_user):
+    if tinder_user_exist(tinder_user):
+        pass
+    db.session.add(tinder_user)
 
 
 def user_exists(username):
@@ -94,3 +103,4 @@ def load_pynder_session(username):
 def create_pynder_session(fb_token, fb_id=None):
     pynder_session = pynder.Session(facebook_id=fb_id, facebook_token=fb_token)
     return pynder_session
+

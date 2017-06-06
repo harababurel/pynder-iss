@@ -9,7 +9,8 @@ import itertools
 import db_util
 import pickle
 
-from models import Hopeful
+from models import Hopeful, TinderUser
+
 
 def preporcess_login():
     if 'username' in session:
@@ -45,7 +46,7 @@ def swipe():
         return result
     pynder_session = db_util.load_pynder_session(session['username'])
     current_person = next(pynder_session.nearby_users())
-
+    db_util.add_tinder_user(TinderUser(current_person))
     hopeful = Hopeful(current_person)
     db_util.add_hopeful(hopeful)
 
