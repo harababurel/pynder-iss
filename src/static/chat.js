@@ -110,6 +110,7 @@ $(function () {
             activeChat.timer = setTimeout(activeChat.updateRequest.bind(activeChat), REQUEST_INTERVAL);
         activeChat = null;
         $('#chat-div > ul').empty();
+        $('#chat-div').collapse('hide');
     })
 });
 $('#send-message').submit(function (e) {
