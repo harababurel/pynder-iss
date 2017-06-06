@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+<br>
+<div class="row">
+  <div class="col-md-3"></div>
+
+  <div class="col-md-6">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">General</h3>
+      </div>
+      <div class="panel-body">
+
+        <pre>{{ pretty_data|safe }}</pre>
+        <canvas id="gender-distribution-chart" width="800" height="450"></canvas>
+
+        <hr>
+        <canvas id="age-distribution-chart" width="800" height="450"></canvas>
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3"></div>
+</div>
+
+<script>
+  new Chart(document.getElementById("gender-distribution-chart"), {
+      type: 'doughnut',
+      data: {
+        labels: ["Male", "Female"],
+        datasets: [
+          {
+            label: "Population (millions)",
+            backgroundColor: ["#3e95cd", "#c45850"],
+            data: [{{ data['male']['count'] }}, {{ data['female']['count'] }}]
+          }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'Gender distribution of all persons swiped on'
+        }
+      }
+  });
+</script>
+
+
+<script>
+  new Chart(document.getElementById("age-distribution-chart"), {
+    type: 'line',
+    data: {
+      labels: {{ data['ages'] }},
+      datasets: [{
+          data: [
+            {% for x in data['male']['age'].items() | sort %}
+              { x: {{ x[0] }}, y: {{ x[1] }} },
+            {% endfor %}
+          ],
+          label: "Male",
+          borderColor: "#3e95cd",
+          fill: false
+        }, {
+          data: [
+            {% for x in data['female']['age'].items() | sort %}
+              { x: {{ x[0] }}, y: {{ x[1] }} },
+            {% endfor %}
+          ],
+          label: "Female",
+          borderColor: "#c45850",
+          fill: false
+        }
+      ]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Age distribution per gender'
+      }
+    }
+  });
+</script>
+
+
+
+
+{% endblock %}
