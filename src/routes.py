@@ -19,7 +19,6 @@ def logged_in():
     return 'username' in session
 
 
-
 @app.route("/")
 def index():
     if not logged_in():
@@ -32,7 +31,7 @@ def chat(id):
     pynder_session = db_util.load_pynder_session(session['username'])
     current_match = None
     for match in list(itertools.islice(
-        pynder_session.matches(), 0, config['max_matches_shown'])):
+            pynder_session.matches(), 0, config['max_matches_shown'])):
         if match.user.id == id:
             current_match = match
     message = request.form['message']
@@ -232,6 +231,17 @@ def messages():
             if len(messageList) > seen_messages:
                 return jsonify("1")
     return ""
+
+
+@app.route('/unmatch/<id>', methods=['POST'])
+def unmatch(id):
+    pynder_session = db_util.load_pynder_session(session['username'])
+    current_match = None
+    for match in list(itertools.islice(
+            pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.user.id == id:
+            current_match = match
+    current_match.delete()
 
 
 @app.errorhandler(404)
