@@ -1,6 +1,6 @@
 from main import db
 from models import User, Hopeful, TinderUser, Photo, School, Vote, Match
-from sqlalchemy import exists
+from sqlalchemy import exists, or_
 import pynder
 import pickle
 
@@ -11,14 +11,13 @@ def tinder_user_exist(tinder_user):
 
 def add_tinder_user(tinder_user):
     if tinder_user_exist(tinder_user):
-        pass
+        return
     db.session.add(tinder_user)
     db.session.commit()
 
 
 def get_tinder_user(id):
     return db.session.query(TinderUser).filter(TinderUser.id == id).first()
-
 
 
 def user_exists(username):
@@ -126,21 +125,28 @@ def vote_exist(vote):
     return db.session.query(exists().where(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id)).scalar()
 
 
-def match_exist(match):
-    return db.session.query(exists()
-                            .where((Match.person1_id == match.person1_id and Match.person2_id == match.person2_id) or
-                                   (Match.person2_id == match.person1_id and Match.person1_id == match.person2_id))).scalar()
+def match_exist(person1_id, person2_id):
+    result = db.session.query(exists()
+                            .where(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
+                                       (Match.person2_id == person1_id and Match.person1_id == person2_id)))).scalar()
+    return result
 
 def get_vote(vote):
     return db.session.query(Vote).filter(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id).first()
 
 
-def get_match(match):
-    return db.session.query(Match).filter((Match.person1_id == match.person1_id and Match.person2_id == match.person2_id) or
-                                   (Match.person2_id == match.person1_id and Match.person1_id == match.person2_id)).first()
+def get_match(person1_id, person2_id):
+    return db.session.query(Match).filter(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
+                                       (Match.person2_id == person1_id and Match.person1_id == person2_id))).first()
 
-def update_vote(vote):
-    if not vote_exist(vote):
-        pass
-    get_vote(vote).value = vote.value
 
+def update_match_nr_of_messages(person1_id, person2_id, nr_of_messages):
+    if not match_exist(person1_id, person2_id):
+        return None
+    get_match(person1_id, person2_id).nr_of_messages = nr_of_messages
+    db.session.commit()
+
+def get_match_nr_of_messages(person1_id, person2_id):
+    if not match_exist(person1_id, person2_id):
+        return -1
+    return get_match(person1_id, person2_id).nr_of_messages

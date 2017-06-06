@@ -90,7 +90,7 @@ def vote():
     print("match = %r" % match)
 
     if match is not False:
-        db_util.add_match(Match(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id)))
+        db_util.add_match(Match(profile.id, hopeful.id))
         message = "You have got a new match!"
         if match['is_super_like']:
             message += " %s superliked you :)" % hopeful.name
@@ -165,3 +165,4 @@ def logout():
 @app.errorhandler(404)
 def page_not_found(error):
     return "page not found", 404
+
