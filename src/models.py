@@ -78,40 +78,41 @@ class TinderUser(db.Model):
     schools = db.relationship('UserSchool')
 
     def __init__(self, data):
-        self.id = data.id
+        with db.session.no_autoflush:
+            self.id = data.id
 
-        self.name = data.name[:20]
+            self.name = data.name[:20]
 
-        self.bio = data.bio[:500]
+            self.bio = data.bio[:500]
 
-        if hasattr(data, 'birth_date'):
-            self.birth_date = data.birth_date
+            if hasattr(data, 'birth_date'):
+                self.birth_date = data.birth_date
 
-        self.gender = data.gender
+            self.gender = data.gender
 
-        if hasattr(data, 'photo'):
-            for photo in data.photos:
-                self.photos.append(Photo(photo, self.id))
+            if hasattr(data, 'photo'):
+                for photo in data.photos:
+                    self.photos.append(Photo(photo, self.id))
 
 
-        if hasattr(data, 'jobs'):
-            for job in data.jobs:
-                userjob = UserJob()
-                if job_exist(job):
-                    userjob.job= get_job(job)
-                else:
-                    userjob.job = Job(job)
-                self.jobs.append(userjob)
+            if hasattr(data, 'jobs'):
+                for job in data.jobs:
+                    userjob = UserJob()
+                    if job_exist(job):
+                        userjob.job= get_job(job)
+                    else:
+                        userjob.job = Job(job)
+                    self.jobs.append(userjob)
 
-        if hasattr(data, 'school'):
-            for school in data.schools:
-                userschool = UserSchool()
-                if school_exist(school):
-                    userschool.school = get_school(school)
-                else:
-                    userschool.school = School(school)
+            if hasattr(data, 'school'):
+                for school in data.schools:
+                    userschool = UserSchool()
+                    if school_exist(school):
+                        userschool.school = get_school(school)
+                    else:
+                        userschool.school = School(school)
 
-            self.schools.append(userschool)
+                self.schools.append(userschool)
 
 
 class Photo(db.Model):
@@ -147,7 +148,7 @@ class School(db.Model):
 
 
 class Vote(db.Model):
-    __tabelename__ = 'votes'
+    __tabelname__ = 'votes'
 
     voter_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     hopeful_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
@@ -161,7 +162,7 @@ class Vote(db.Model):
 
 
 class Match(db.Model):
-    __tabelename__ = 'matches'
+    __tabelname__ = 'matches'
 
     person1_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     person2_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
