@@ -122,6 +122,7 @@ $('#send-message').submit(function (e) {
         success: function (data) {
         }
     });
+    $('#send-message')[0].reset();
     e.preventDefault();
 });
 
