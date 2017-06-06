@@ -1,28 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<br>
-<div class="row">
-  <div class="col-md-3"></div>
-    <div class="col-md-6">
-      <div class="form-box">
-          {% from "_formhelpers.html" import render_field %}
-          <form action="/settings" method="post">
-            <dl>
-                {{ render_field(form.age_min) }}
-                {{ render_field(form.age_max) }}
-                {{ render_field(form.gender) }}
-{#                {{ render_field(form.interested_in) }}#}
-                {{ render_field(form.bio) }}
-                {{ render_field(form.discoverable) }}
-                {{ render_field(form.distance_filter) }}
-            </dl>
-              <p><input type=submit value=Update>
-          </form>
-      </div>
+    <br>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="panel panel-default ">
+                <div class="panel-heading">
+                    <h1 class="panel-title">Settings</h1>
+                </div>
+                <div class="panel-body form-box">
+                    {% from "_formhelpers.html" import render_field %}
+                    <form class="" action="/settings" method="post">
+                        <dl class="dl-horizontal">
+                            {{ render_field(form.age_min) }}
+                            {{ render_field(form.age_max) }}
+                            {{ render_field(form.gender, class_="list-unstyled radio gender") }}
+                            {#                {{ render_field(form.interested_in) }}#}
+                            {{ render_field(form.bio, class_="form-control") }}
+                            {{ render_field(form.discoverable) }}
+                            {{ render_field(form.distance_filter) }}
+                        </dl>
+                        <p><input type=submit value=Update>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+        <div class="col-md-3"></div>
     </div>
-    <div class="col-md-3"></div>
-  <div class="col-md-3"></div>
-</div>
 
 {% endblock %}
