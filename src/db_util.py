@@ -122,15 +122,16 @@ def add(entity):
     db.session.commit()
 
 
-def vote_exist(vote):
+def vote_exists(vote):
     return db.session.query(exists().where(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id)).scalar()
 
 
-def match_exist(person1_id, person2_id):
+def match_exists(person1_id, person2_id):
     result = db.session.query(exists()
                             .where(or_((Match.person1_id == person1_id and Match.person2_id == person2_id),
                                        (Match.person2_id == person1_id and Match.person1_id == person2_id)))).scalar()
     return result
+
 
 def get_vote(vote):
     return db.session.query(Vote).filter(Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id).first()
@@ -141,14 +142,14 @@ def get_match(person1_id, person2_id):
                                        (Match.person2_id == person1_id and Match.person1_id == person2_id))).first()
 
 
-def update_match_nr_of_messages(person1_id, person2_id, nr_of_messages):
-    if not match_exist(person1_id, person2_id):
+def set_message_count(person1_id, person2_id, nr_of_messages):
+    if not match_exists(person1_id, person2_id):
         return None
     get_match(person1_id, person2_id).nr_of_messages = nr_of_messages
     db.session.commit()
 
 
-def get_match_nr_of_messages(person1_id, person2_id):
-    if not match_exist(person1_id, person2_id):
+def get_message_count(person1_id, person2_id):
+    if not match_exists(person1_id, person2_id):
         return -1
     return get_match(person1_id, person2_id).nr_of_messages

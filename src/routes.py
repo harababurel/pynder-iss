@@ -14,25 +14,22 @@ import pickle
 from models import Hopeful, TinderUser, Vote, Match
 
 
-def preprocess_login():
-    if 'username' in session:
-        return None
-    return render_template('index.html')
+def logged_in():
+    return 'username' in session
+
 
 
 @app.route("/")
 def index():
-    result = preprocess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
     return redirect(url_for('matches'))
 
 
 @app.route("/matches")
 def matches():
-    result = preprocess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
     pynder_session = db_util.load_pynder_session(session['username'])
     current_matches = list(itertools.islice(
         pynder_session.matches(), 0, config['max_matches_shown']))
@@ -44,9 +41,8 @@ def matches():
 
 @app.route("/swipe")
 def swipe():
-    result = preprocess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
     pynder_session = db_util.load_pynder_session(session['username'])
     try:
         current_person = next(pynder_session.nearby_users())
@@ -61,12 +57,10 @@ def swipe():
 
 @app.route("/vote", methods=['POST'])
 def vote():
-    result = preprocess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
 
-    access_token = db_util.load_pynder_session(session["username"])
-    profile = Profile(access_token._api.profile(), access_token._api)
+    pynder_session = db_util.load_pynder_session(session["username"])
 
     hash_code = int(request.form['person_hash_code'])
 
@@ -91,12 +85,12 @@ def vote():
     else:
         match = hopeful.superlike()
 
-    db_util.add(Vote(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id), vote))
+    db_util.add(Vote(db_util.get_tinder_user(pynder_session.profile.id), db_util.get_tinder_user(hopeful.id), vote))
 
     print("match = %r" % match)
 
     if match is not False:
-        db_util.add(Match(profile.id, hopeful.id))
+        db_util.add(Match(pynder_session.profile.id, hopeful.id))
         message = "You have got a new match!"
         if match['is_super_like']:
             message += " %s superliked you :)" % hopeful.name
@@ -110,6 +104,8 @@ def vote():
 
 @app.route('/statistics')
 def statistics():
+    if not logged_in():
+        return render_template('index.html')
     data = {
         'male': {
             'count': 0,
@@ -160,9 +156,8 @@ def login():
             session['username'] = username
             # session['access_token'] = access_token
 
-            access_token = db_util.load_pynder_session(username)
-            profile = Profile(access_token._api.profile(), access_token._api)
-            db_util.add_tinder_user(TinderUser(profile))
+            pynder_session = db_util.load_pynder_session(username)
+            db_util.add_tinder_user(TinderUser(pynder_session.profile))
 
             return redirect(url_for('index'))
 
@@ -170,7 +165,7 @@ def login():
             return render_template("base.html", error="Could not get access token. %s" % e)
 
     else:
-        if 'username' in session:
+        if logged_in():
             return redirect(url_for('index'))
         else:
             return render_template('login.html')
@@ -178,8 +173,11 @@ def login():
 
 @app.route("/settings", methods=['GET', 'POST'])
 def settings():
+    if not logged_in():
+        return render_template('index.html')
+
     pynder_session = db_util.load_pynder_session(session['username'])
-    profile = Profile(pynder_session._api.profile(), pynder_session._api)
+
     form = SettingsForm(request.form)
     if request.method == 'POST' and form.validate():
         # data = dict([(a, getattr(form, a).data) for a in dir(
@@ -196,9 +194,9 @@ def settings():
 
 @app.route('/logout')
 def logout():
-    result = preprocess_login()
-    if result is not None:
-        return result
+    if not logged_in():
+        return render_template('index.html')
+
     session.pop('username', None)
     # session.pop('access_token', None)
     return redirect(url_for('index'))

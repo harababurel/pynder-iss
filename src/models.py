@@ -42,26 +42,30 @@ class Hopeful(db.Model):
     def __repr__(self):
         return "<Hopeful %i>" % self.hash_code
 
+
 class UserSchool(db.Model):
     __tablename__ = 'userschool'
-    user_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
-    school_id = db.Column(db.Integer, db.ForeignKey('school.id'), primary_key=True)
+
+    user_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
+    school_id = db.Column(db.Integer, db.ForeignKey('schools.id'), primary_key=True)
 
     school = db.relationship('School')
 
     def __init__(self):
         pass
 
+
 class UserJob(db.Model):
     __tablename__ = 'userjob'
 
-    user_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
-    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), primary_key=True)
+    user_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), primary_key=True)
 
     job = db.relationship('Job')
 
+
 class TinderUser(db.Model):
-    __tablename__ = 'tinderuser'
+    __tablename__ = 'tinderusers'
 
     id = db.Column(db.String(25), primary_key=True)
     name = db.Column(db.String(20))
@@ -115,7 +119,7 @@ class Photo(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     url = db.Column(db.String(200))
-    user_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'))
+    user_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'))
 
     def __init__(self, url, user_id):
         self.url = url
@@ -123,7 +127,7 @@ class Photo(db.Model):
 
 
 class Job(db.Model):
-    __tablename__ = 'job'
+    __tablename__ = 'jobs'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(200))
@@ -133,7 +137,7 @@ class Job(db.Model):
 
 
 class School(db.Model):
-    __tablename__ = 'school'
+    __tablename__ = 'schools'
 
     name = db.Column(db.String(200), unique=True)
     id = db.Column(db.Integer, autoincrement=True,  primary_key=True)
@@ -141,11 +145,12 @@ class School(db.Model):
     def __init__(self, name):
         self.name = name[:200]
 
-class Vote(db.Model):
-    __tabelename__ = 'vote'
 
-    voter_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
-    hopeful_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
+class Vote(db.Model):
+    __tabelename__ = 'votes'
+
+    voter_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
+    hopeful_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
     value = db.Column(db.String(10))
 
 
@@ -156,19 +161,21 @@ class Vote(db.Model):
 
 
 class Match(db.Model):
-    __tabelename__ = 'vote'
+    __tabelename__ = 'matches'
 
-    person1_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
-    person2_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
-    nr_of_messages = db.Column(db.Integer)
+    person1_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
+    person2_id = db.Column(db.String(25), db.ForeignKey('tinderusers.id'), primary_key=True)
+    message_count = db.Column(db.Integer)
 
     def __init__(self, person1, person2):
         self.person1_id = person1
         self.person2_id = person2
-        self.nr_of_messages = 0
+        self.message_count = 0
+
 
 def school_exist(school):
     return db.session.query(exists().where(School.name == school)).scalar()
+
 
 def get_school(school):
     return db.session.query(School).filter(School.name == school).first()
@@ -177,6 +184,6 @@ def get_school(school):
 def job_exist(job):
     return db.session.query(exists().where(Job.name == job)).scalar()
 
+
 def get_job(job):
     return db.session.query(Job).filter(Job.name == job).first()
-
