@@ -1,4 +1,4 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash, jsonify
 from pynder.models import Profile
 from collections import defaultdict
 from pprint import pformat
@@ -25,6 +25,18 @@ def index():
     if not logged_in():
         return render_template('index.html')
     return redirect(url_for('matches'))
+
+
+@app.route("/chat/<id>", methods=['POST'])
+def chat(id):
+    pynder_session = db_util.load_pynder_session(session['username'])
+    current_match = None
+    for match in list(itertools.islice(
+        pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.user.id == id:
+            current_match = match
+    message = request.form['message']
+    current_match.message(message)
 
 
 @app.route("/matches")
@@ -192,6 +204,34 @@ def logout():
     session.pop('username', None)
     # session.pop('access_token', None)
     return redirect(url_for('index'))
+
+
+@app.route('/messages', methods=['POST'])
+def messages():
+    pynder_session = db_util.load_pynder_session(session['username'])
+    current_match = None
+    for match in list(itertools.islice(
+            pynder_session.matches(), 0, config['max_matches_shown'])):
+        if match.user.id == request.json['match']:
+            current_match = match
+    if current_match is not None:
+        seen_messages = 0
+        if not db_util.match_exists(pynder_session.profile.id, current_match.user.id):
+            db_util.add(Match(pynder_session.profile.id, current_match.user.id))
+        else:
+            seen_messages = db_util.get_message_count(pynder_session.profile.id, current_match.user.id)
+        messageList = current_match.messages
+        if request.json['active']:
+            if int(request.json['messageNumber']) == 0:
+                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+            if len(messageList) > seen_messages:
+                messageList = messageList[int(request.json['messageNumber']):]
+                db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(messageList))
+                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+        else:
+            if len(messageList) > seen_messages:
+                return jsonify("1")
+    return ""
 
 
 @app.errorhandler(404)

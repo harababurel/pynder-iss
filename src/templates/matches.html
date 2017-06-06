@@ -6,9 +6,9 @@
         <div class="col-md-3 pre-scrollable" style="max-height: 100%">
             {% for user in matched_users %}
                 <div class="panel panel-default" style="margin-bottom: 0">
-                    <div class="panel-heading" data-parent="#accordion" data-toggle="collapse"
+                    <div class="panel-heading div-match" data-parent="#accordion" data-toggle="collapse"
                          data-target="#{{ user.id }}">
-                        <h1 class="panel-title">
+                        <h1 class="panel-title" id="title{{ user.id }}">
                             <img class="img-circle" src="{{ user.photos[0] }}"
                                  style="display: inline-block; max-width: 50px;">
                             {{ user.name }} ({{ user.age }})
@@ -23,7 +23,7 @@
 
         <div class="col-md-1"></div>
 
-        <div class="panel panel-default col-md-6">
+        <div class="panel panel-default col-md-6" id="profile-div">
             {% for user in matched_users %}
                 <div class="panel-body collapse {% if loop.index == 1 %} in {% endif %}" id="{{ user.id }}">
                     <div class="media">
@@ -129,7 +129,8 @@
                             {% endif %}#}
                         </div>
                         <div class="media-bottom">
-                            <button class="btn btn-success">
+                            <button class="btn btn-success" data-toggle="collapse" data-target="#{{ user.id }}"
+                                    onclick="openChat('{{ user.id }}')">
                                 Message
                                 <span class="glyphicon glyphicon-envelope"></span>
                             </button>
@@ -141,8 +142,25 @@
                 </div>
 
             {% endfor %}
+            <div class="panel-body collapse" id="chat-div">
+                <ul class="chat">
+                </ul>
+
+                <div class="panel-footer">
+                    <form id="send-message">
+                        <div class="input-group">
+                            <input name="message" id="btn-input" type="text" class="form-control input-sm"
+                                   placeholder="Type your message here..." required/>
+                            <span class="input-group-btn">
+                            <button class="btn btn-warning btn-sm" id="btn-chat">
+                                Send</button>
+                        </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="col-md-2"></div>
     </div>
-
+    <script src="/static/chat.js"></script>
 {% endblock %}

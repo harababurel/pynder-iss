@@ -142,14 +142,14 @@ def get_match(person1_id, person2_id):
                                        (Match.person2_id == person1_id and Match.person1_id == person2_id))).first()
 
 
-def set_message_count(person1_id, person2_id, nr_of_messages):
+def set_message_count(person1_id, person2_id, message_count):
     if not match_exists(person1_id, person2_id):
         return None
-    get_match(person1_id, person2_id).nr_of_messages = nr_of_messages
+    get_match(person1_id, person2_id).message_count = message_count
     db.session.commit()
 
 
 def get_message_count(person1_id, person2_id):
     if not match_exists(person1_id, person2_id):
         return -1
-    return get_match(person1_id, person2_id).nr_of_messages
+    return get_match(person1_id, person2_id).message_count
