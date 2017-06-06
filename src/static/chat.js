@@ -72,7 +72,7 @@ class chat {
                     thisClass.notified = true;
                     $('#title' + thisClass.matchId).append('<span class="label label-primary notification" style="float: right; margin-right: 5px">New message</span>');
                 }
-                if(!thisClass.notified)
+                if (!thisClass.notified)
                     thisClass.timer = setTimeout(thisClass.updateRequest.bind(thisClass), REQUEST_INTERVAL);
             }
         });
@@ -103,13 +103,15 @@ $('document').ready(function () {
 });
 $(function () {
     $('.div-match').click(function () {
-        if (activeChat != null)
+        if (activeChat != null) {
             clearTimeout(activeChat.timer);
             activeChat.active = false;
             activeChat.notified = false;
             activeChat.timer = setTimeout(activeChat.updateRequest.bind(activeChat), REQUEST_INTERVAL);
-        activeChat = null;
+            activeChat = null;
+        }
         $('#chat-div > ul').empty();
+        $('#chat-div').collapse('hide');
     })
 });
 $('#send-message').submit(function (e) {
