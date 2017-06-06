@@ -1,5 +1,6 @@
 .vote {
     border-radius: 50%!important;
+    margin-top: 10px!important;
 }
 
 .vote i{
@@ -7,5 +8,6 @@
 }
 
 .superlike {
-    margin: 0 30px!important;
+    margin-left: 30px!important;
+    margin-right: 30px!important;
 }
