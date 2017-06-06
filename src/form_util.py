@@ -41,7 +41,11 @@ class SettingsForm(Form):
         self.bio.data = profile.bio
         print("profile.bio = %r" % profile.bio)
         self.distance_filter.data = profile.distance_filter
-        self.discoverable.data = profile.discoverable
+
+        try:
+            self.discoverable.data = profile.discoverable
+        except:
+            self.discoverable.data = True
 
     def update_profile_from_fields(self, pynder_session):
         new_settings = {
