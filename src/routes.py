@@ -12,6 +12,7 @@ import db_util
 import pickle
 
 from models import Hopeful, TinderUser, Vote, Match
+from statistics import generate_age_statistics
 
 
 def logged_in():
