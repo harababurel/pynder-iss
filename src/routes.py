@@ -27,7 +27,7 @@ def index():
     return redirect(url_for('matches'))
 
 
-@app.route("/chat/<id>", methods=['GET', 'POST'])
+@app.route("/chat/<id>", methods=['POST'])
 def chat(id):
     pynder_session = db_util.load_pynder_session(session['username'])
     current_match = None
@@ -35,12 +35,8 @@ def chat(id):
         pynder_session.matches(), 0, config['max_matches_shown'])):
         if match.user.id == id:
             current_match = match
-    print(current_match.id)
-    if request.method == 'POST':
-        message = request.form['message']
-        current_match.message(message)
-
-    return render_template("chat.html", match=current_match)
+    message = request.form['message']
+    current_match.message(message)
 
 
 @app.route("/matches")
@@ -216,13 +212,16 @@ def messages():
     current_match = None
     for match in list(itertools.islice(
             pynder_session.matches(), 0, config['max_matches_shown'])):
-        if match.id == request.json['match']:
+        if match.user.id == request.json['match']:
             current_match = match
     if current_match is not None:
         messageList = current_match.messages
         messageList = messageList[int(request.json['messageNumber']):]
         if len(messageList) > 0:
-            return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+            if request.json['active']:
+                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+            else:
+                return "1"
     return ""
 
 
