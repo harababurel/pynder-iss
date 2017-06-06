@@ -82,7 +82,7 @@ def user_has_access_token(username):
 
 def user_has_pynder_session(username):
     pynder_session = get_user(username).pynder_session
-    return pynder_session is not None and len(get_user(username).pynder_session) > 0
+    return pynder_session is not None and len(pynder_session) > 0
 
 
 def dump_pynder_session(username, pynder_session):
@@ -117,13 +117,8 @@ def create_pynder_session(fb_token, fb_id=None):
     return pynder_session
 
 
-def add_vote(vote):
-    db.session.add(vote)
-    db.session.commit()
-
-
-def add_match(match):
-    db.session.add(match)
+def add(entity):
+    db.session.add(entity)
     db.session.commit()
 
 
@@ -151,6 +146,7 @@ def update_match_nr_of_messages(person1_id, person2_id, nr_of_messages):
         return None
     get_match(person1_id, person2_id).nr_of_messages = nr_of_messages
     db.session.commit()
+
 
 def get_match_nr_of_messages(person1_id, person2_id):
     if not match_exist(person1_id, person2_id):

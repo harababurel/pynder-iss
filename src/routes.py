@@ -91,12 +91,12 @@ def vote():
     else:
         match = hopeful.superlike()
 
-    db_util.add_vote(Vote(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id), vote))
+    db_util.add(Vote(db_util.get_tinder_user(profile.id), db_util.get_tinder_user(hopeful.id), vote))
 
     print("match = %r" % match)
 
     if match is not False:
-        db_util.add_match(Match(profile.id, hopeful.id))
+        db_util.add(Match(profile.id, hopeful.id))
         message = "You have got a new match!"
         if match['is_super_like']:
             message += " %s superliked you :)" % hopeful.name
