@@ -215,12 +215,21 @@ def messages():
         if match.user.id == request.json['match']:
             current_match = match
     if current_match is not None:
+        seen_messages = 0
+        if not db_util.match_exists(pynder_session.profile.id, current_match.user.id):
+            db_util.add(Match(pynder_session.profile.id, current_match.user.id))
+        else:
+            seen_messages = db_util.get_message_count(pynder_session.profile.id, current_match.user.id)
         messageList = current_match.messages
-        messageList = messageList[int(request.json['messageNumber']):]
-        if len(messageList) > 0:
-            if request.json['active']:
+        if request.json['active']:
+            if int(request.json['messageNumber']) == 0:
                 return render_template("messages.html", messages=messageList, user=pynder_session.profile)
-            else:
+            if len(messageList) > seen_messages:
+                messageList = messageList[int(request.json['messageNumber']):]
+                db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(messageList))
+                return render_template("messages.html", messages=messageList, user=pynder_session.profile)
+        else:
+            if len(messageList) > seen_messages:
                 return jsonify("1")
     return ""
 
