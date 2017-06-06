@@ -15,6 +15,7 @@ class chat {
         this.autoScrool = true;
         this.active = false;
         this.timer = null;
+        this.notified = null;
         this.updateRequest();
     }
 
@@ -67,10 +68,12 @@ class chat {
             complete: function (data) {
                 if (thisClass.autoScrool)
                     thisClass.updateScroll();
-                if(data.responseText !== "")
-                    this;// TODO notification
-                else
-                    thisClass.timer = setTimeout(thisClass.updateRequest.bind(thisClass), ACTIVE_REQUEST_INTERVAL);
+                if (data.responseText !== "" && !thisClass.notified) {
+                    thisClass.notified = true;
+                    $('#title' + thisClass.matchId).append('<span class="label label-primary notification" style="float: right; margin-right: 5px">New message</span>');
+                }
+                if(!thisClass.notified)
+                    thisClass.timer = setTimeout(thisClass.updateRequest.bind(thisClass), REQUEST_INTERVAL);
             }
         });
     }
@@ -81,6 +84,7 @@ function openChat(userId) {
         if (_chat.matchId === userId) {
             activeChat = _chat;
             activeChat.active = true;
+            $('#title' + activeChat.matchId + ' > .notification').remove();
             clearTimeout(activeChat.timer);
             activeChat.updateRequest();
             break
@@ -100,7 +104,10 @@ $('document').ready(function () {
 $(function () {
     $('.div-match').click(function () {
         if (activeChat != null)
+            clearTimeout(activeChat.timer);
             activeChat.active = false;
+            activeChat.notified = false;
+            activeChat.timer = setTimeout(activeChat.updateRequest.bind(activeChat), REQUEST_INTERVAL);
         activeChat = null;
         $('#chat-div > ul').empty();
     })
@@ -108,12 +115,11 @@ $(function () {
 $('#send-message').submit(function (e) {
     console.log(e);
     $.ajax({
-           type: 'POST',
-           url: '/chat/' + activeChat.matchId,
-           data: $("#send-message").serialize(), // serializes the form's elements.
-           success: function(data)
-           {
-           }
-         });
+        type: 'POST',
+        url: '/chat/' + activeChat.matchId,
+        data: $("#send-message").serialize(), // serializes the form's elements.
+        success: function (data) {
+        }
+    });
     e.preventDefault();
 });

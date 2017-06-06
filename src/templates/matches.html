@@ -8,7 +8,7 @@
                 <div class="panel panel-default" style="margin-bottom: 0">
                     <div class="panel-heading div-match" data-parent="#accordion" data-toggle="collapse"
                          data-target="#{{ user.id }}">
-                        <h1 class="panel-title">
+                        <h1 class="panel-title" id="title{{ user.id }}">
                             <img class="img-circle" src="{{ user.photos[0] }}"
                                  style="display: inline-block; max-width: 50px;">
                             {{ user.name }} ({{ user.age }})

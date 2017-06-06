@@ -1,4 +1,4 @@
-from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash
+from flask import request, session, g, escape, render_template, abort, redirect, url_for, flash, jsonify
 from pynder.models import Profile
 from collections import defaultdict
 from pprint import pformat
@@ -221,7 +221,7 @@ def messages():
             if request.json['active']:
                 return render_template("messages.html", messages=messageList, user=pynder_session.profile)
             else:
-                return "1"
+                return jsonify("1")
     return ""
 
 
