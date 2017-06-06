@@ -160,10 +160,12 @@ class Match(db.Model):
 
     person1_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
     person2_id = db.Column(db.String(25), db.ForeignKey('tinderuser.id'), primary_key=True)
+    nr_of_messages = db.Column(db.Integer)
 
     def __init__(self, person1, person2):
-        self.person1_id = person1.id
-        self.person2_id = person2.id
+        self.person1_id = person1
+        self.person2_id = person2
+        self.nr_of_messages = 0
 
 def school_exist(school):
     return db.session.query(exists().where(School.name == school)).scalar()
