@@ -133,6 +133,7 @@ def settings():
     form = SettingsForm(request.form)
     if request.method == 'POST' and form.validate():
         form.set_profile_from_fields(profile)
+        print("=======================CHANGES MADE========================")
     else:
         pass
     form.set_fields_from_profile(profile)

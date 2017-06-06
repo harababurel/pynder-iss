@@ -1,0 +1,11 @@
+.vote {
+    border-radius: 50%;
+}
+
+.vote i{
+    font-size: xx-large;
+}
+
+.superlike {
+    margin: 0 30px;
+}

@@ -39,7 +39,7 @@ class SettingsForm(Form):
     # interested_in = MultiCheckboxField('Interested in:', choices=[('male', 'Male'), ('female', 'Female')])
     bio = TextAreaField("Bio")
     discoverable = BooleanField("Discoverable")
-    distance_filter = IntegerField("Distance Filter", [validators.data_required(), validators.number_range(min=1, max=50)])
+    distance_filter = IntegerField("Distance Filter", [validators.data_required(), validators.number_range(min=1, max=100)])
 
 
     def set_fields_from_profile(self, profile):
