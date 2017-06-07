@@ -12,7 +12,7 @@ class chat {
     constructor(matchId) {
         this.matchId = matchId;
         this.totalMessages = 0;
-        this.autoScrool = true;
+        this.autoScroll = true;
         this.active = false;
         this.timer = null;
         this.notified = null;
@@ -20,7 +20,7 @@ class chat {
     }
 
     updateScroll() {
-        if (this.autoScrool) {
+        if (this.autoScroll) {
             let element = document.getElementById('chat-div');
             element.scrollTop = element.scrollHeight;
         }
@@ -47,7 +47,7 @@ class chat {
             }),
             complete: function (data) {
                 $('#chat-div > ul').append(data.responseText);
-                if (thisClass.autoScrool)
+                if (thisClass.autoScroll)
                     thisClass.updateScroll();
                 thisClass.timer = setTimeout(thisClass.updateRequest.bind(thisClass), ACTIVE_REQUEST_INTERVAL);
             }
@@ -66,7 +66,7 @@ class chat {
                 match: thisClass.matchId
             }),
             complete: function (data) {
-                if (thisClass.autoScrool)
+                if (thisClass.autoScroll)
                     thisClass.updateScroll();
                 if (data.responseText !== "" && !thisClass.notified) {
                     thisClass.notified = true;
@@ -115,7 +115,6 @@ $(function () {
     })
 });
 $('#send-message').submit(function (e) {
-    console.log(e);
     $.ajax({
         type: 'POST',
         url: '/chat/' + activeChat.matchId,
@@ -123,5 +122,15 @@ $('#send-message').submit(function (e) {
         success: function (data) {
         }
     });
+    $('#send-message')[0].reset();
     e.preventDefault();
+});
+
+$('#chat-div').on('scroll', function () {
+    let element = document.getElementById('chat-div');
+    console.log(element.scrollHeight, element.scrollTop, activeChat.autoScroll);
+    if (element.scrollTop != element.scrollHeight)
+        activeChat.autoScroll = false;
+    if (element.scrollHeight - element.scrollTop <= 570)
+        activeChat.autoScroll = true;
 });
