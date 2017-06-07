@@ -41,8 +41,17 @@ class ChatView(MethodView, ApplicationView):
                 pynder_session.matches(), 0, config['max_matches_shown'])):
             if match.user.id == user_id:
                 current_match = match
+                break
         message = request.form['message']
-        current_match.message(message)
+
+        try:
+            print("sending message <%s> to %r." % (message, current_match.user))
+            current_match.message(message)
+            print("message sent :)")
+        except:
+            print("could not send message to %r" % current_match.user)
+
+        return ""
 
 
 class MatchesView(View, ApplicationView):

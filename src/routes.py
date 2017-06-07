@@ -5,7 +5,7 @@ from view import IndexView, ChatView, MatchesView, SwipeView, VoteView, Statisti
 statistics_view_func = StatisticsView.as_view('statistics')
 
 app.add_url_rule('/', view_func=IndexView.as_view('index'))
-app.add_url_rule('/chat', view_func=ChatView.as_view('chat'), defaults={'user_id': None}, methods=['POST'])
+app.add_url_rule('/chat/<user_id>', view_func=ChatView.as_view('chat'), methods=['POST'])
 app.add_url_rule('/matches', view_func=MatchesView.as_view('matches'))
 app.add_url_rule('/swipe', view_func=SwipeView.as_view('swipe'))
 app.add_url_rule('/vote', view_func=VoteView.as_view('vote'), methods=['POST'])
