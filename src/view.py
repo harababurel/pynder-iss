@@ -10,7 +10,6 @@ import repository
 from fb_auth import get_access_token
 from form_util import SettingsForm
 from models import TinderUser, Hopeful, Match, Vote
-# from repository import RepoUser, RepoTinderUser, RepoHopeful, RepoMatch, RepoVote
 from statistics import generate_age_statistics
 
 
