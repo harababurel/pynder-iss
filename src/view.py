@@ -6,10 +6,11 @@ from flask.views import View, MethodView
 
 from config import config
 
-import db_util
+import repository
 from fb_auth import get_access_token
 from form_util import SettingsForm
-from models import TinderUser, Hopeful, Match
+from models import TinderUser, Hopeful, Match, Vote
+# from repository import RepoUser, RepoTinderUser, RepoHopeful, RepoMatch, RepoVote
 from statistics import generate_age_statistics
 
 
@@ -21,7 +22,7 @@ class ApplicationView():
 
     @staticmethod
     def get_pynder_session():
-        return db_util.load_pynder_session(session['username'])
+        return repository.RepoUser.load_pynder_session(session['username'])
 
 
 class IndexView(View, ApplicationView):
@@ -70,13 +71,13 @@ class SwipeView(View, ApplicationView):
         pynder_session = self.get_pynder_session()
         try:
             current_person = next(pynder_session.nearby_users())
-            db_util.add_tinder_user(TinderUser(current_person))
+            repository.RepoTinderUser.add_tinder_user(TinderUser(current_person))
         except Exception as e:
             return render_template("base.html",
                                    error="No people nearby. %s" % e)
         else:
             hopeful = Hopeful(current_person)
-            db_util.add_hopeful(hopeful)
+            repository.RepoHopeful.add_hopeful(hopeful)
             return render_template("swipe.html",
                                    session=session,
                                    person=current_person,
@@ -93,7 +94,7 @@ class VoteView(MethodView, ApplicationView):
 
         hash_code = int(request.form['person_hash_code'])
 
-        hopeful = db_util.get_hopeful(hash_code)
+        hopeful = repository.RepoHopeful.get_hopeful(hash_code)
         vote = None
 
         for x in ["dislike", "like", "superlike"]:
@@ -114,11 +115,13 @@ class VoteView(MethodView, ApplicationView):
         else:
             match = hopeful.superlike()
 
+        repository.RepoVote.add(Vote(pynder_session.profile, hopeful, vote))
+
         print("match = %r" % match)
 
         if match is not False:
 
-            db_util.add(Match(pynder_session.profile.id, hopeful.id))
+            repository.RepoMatch.add(Match(pynder_session.profile.id, hopeful.id))
 
             message = "You have got a new match!"
             if match['is_super_like']:
@@ -139,7 +142,7 @@ class StatisticsView(MethodView, ApplicationView):
         if not self.logged_in():
             return render_template('index.html')
 
-        hopefuls = list(db_util.get_all_hopefuls())
+        hopefuls = list(repository.RepoHopeful.get_all_hopefuls())
 
         if category == 'general':
             data = generate_age_statistics(hopefuls)
@@ -170,18 +173,18 @@ class LoginView(MethodView, ApplicationView):
 
             print("access token is %s" % access_token)
 
-            if db_util.user_exists(username):
+            if repository.RepoUser.user_exists(username):
                 print("user exists; updating access token")
-                db_util.update_user(username, access_token)
+                repository.RepoUser.update_user(username, access_token)
             else:
                 print("user does not exist; creating new")
-                db_util.add_user(username, access_token)
+                repository.RepoUser.add_user(username, access_token)
 
             session['username'] = username
             # session['access_token'] = access_token
 
             pynder_session = self.get_pynder_session()
-            db_util.add_tinder_user(TinderUser(pynder_session.profile))
+            repository.RepoTinderUser.add_tinder_user(TinderUser(pynder_session.profile))
 
             return redirect(url_for('index'))
 
@@ -254,10 +257,10 @@ class MessagesView(MethodView, ApplicationView):
         if current_match is not None:
             seen_messages = 0
 
-            if not db_util.match_exists(pynder_session.profile.id, current_match.user.id):
-                db_util.add(Match(pynder_session.profile.id, current_match.user.id))
+            if not repository.RepoMatch.match_exists(pynder_session.profile.id, current_match.user.id):
+                repository.RepoMatch.add(Match(pynder_session.profile.id, current_match.user.id))
             else:
-                seen_messages = db_util.get_message_count(pynder_session.profile.id, current_match.user.id)
+                seen_messages = repository.RepoMatch.get_message_count(pynder_session.profile.id, current_match.user.id)
 
             message_list = current_match.messages
 
@@ -267,7 +270,7 @@ class MessagesView(MethodView, ApplicationView):
 
                 if len(message_list) > seen_messages:
                     message_list = message_list[int(request.json['messageNumber']):]
-                    db_util.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
+                    repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
                     return render_template("messages.html", messages=message_list, user=pynder_session.profile)
             else:
                 if len(message_list) > seen_messages:

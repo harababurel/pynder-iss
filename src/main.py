@@ -17,7 +17,7 @@ for app_setting in config['app'].items():
 
 db = SQLAlchemy(app)
 
-from db_util import *
+from repository import *
 from routes import *
 
 

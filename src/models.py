@@ -90,7 +90,6 @@ class TinderUser(db.Model):
                 self.schools.append(userschool)
 
 
-
 class Vote(db.Model):
     __tablename__ = 'votes'
 
@@ -115,4 +114,3 @@ class Match(db.Model):
         self.person1_id = person1
         self.person2_id = person2
         self.message_count = 0
-
