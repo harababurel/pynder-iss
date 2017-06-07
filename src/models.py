@@ -66,7 +66,7 @@ class TinderUser(db.Model):
 
             self.gender = data.gender
 
-            if hasattr(data, 'photo'):
+            if hasattr(data, 'photos'):
                 for photo in data.photos:
                     self.photos.append(Photo(photo, self.id))
 
@@ -79,7 +79,7 @@ class TinderUser(db.Model):
                     userjob.job = Job(job)
                 self.jobs.append(userjob)
 
-        if hasattr(data, 'school'):
+        if hasattr(data, 'schools'):
             for school in data.schools:
                 userschool = UserSchool()
                 if RepoSchool.school_exists(school):
