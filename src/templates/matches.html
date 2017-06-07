@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+    {% if matched_users %}
     <div class="row panel-group" id="accordion" style="height: 100%">
         <div class="col-md-3 pre-scrollable" style="max-height: 100%">
             {% for user in matched_users %}
@@ -10,11 +10,13 @@
                          data-target="#{{ user.id }}">
                         <h1 class="panel-title" id="title{{ user.id }}">
                             <img class="img-circle" src="{{ user.photos[0] }}"
-                                 style="display: inline-block; max-width: 50px;">
+                                 style="display: inline-block; max-width: 3em;">
                             {{ user.name }} ({{ user.age }})
+                            <div class="pull-right" style="display: inline-block">
                             {% if user.distance_km %}
-                                <span class="label label-warning" style="float: right">{{ "%.0f" % user.distance_km }} km away</span>
+                                <span class="label label-warning" style="display: block">{{ "%.0f" % user.distance_km }} km away</span>
                             {% endif %}
+                            </div>
                         </h1>
                     </div>
                 </div>
@@ -44,7 +46,7 @@
                                 <div class="carousel-inner">
                                     {% for photo in user.photos %}
                                         <div class="item {% if loop.index == 1 %} active {% endif %}">
-                                            <img class="img-thumbnail" src="{{ photo }}" style="max-width: 300px;">
+                                            <img class="img-thumbnail" src="{{ photo }}" style="width: 300px; min-width: 300px">
                                         </div>
                                     {% endfor %}
 
@@ -175,4 +177,18 @@
             });
         })
     </script>
+    {% else %}
+        <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                You have no matches! Sorry :(
+                <br>
+                <a href="{{ url_for('swipe') }}">Try swiping some more :)</a>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    {% endif %}
 {% endblock %}
