@@ -263,52 +263,53 @@ class MessagesView(MethodView, ApplicationView):
             if match.user.id == request.json['match']:
                 current_match = match
 
+            if not repository.RepoTinderUser.tinder_user_exists(match.user):
+                print("TinderUser %r is a previous match and is missing from the db. Adding now." % match.user)
+
+                try:
+                    repository.RepoTinderUser.add_tinder_user(TinderUser(match.user))
+                except Exception as e:
+                    print("Could not add TinderUser %r to the database. Reason: %s" % (match.user, e))
+
+            if not repository.RepoMatch.match_exists(pynder_session.profile.id, match.user.id):
+                print("There is no match between %r and %r in the database. Adding now." % (pynder_session.profile.id, match.user.id))
+
+                try:
+                    repository.RepoMatch.add(Match(pynder_session.profile.id, match.user.id))
+                except Exception as e:
+                    print("Could not add match between %r and %r to the database. Reason: %s" % (pynder_session.profile.id, match.user.id, e))
+
+
         if current_match is not None:
             seen_messages = 0
+        else:
+            seen_messages = repository.RepoMatch.get_message_count(pynder_session.profile.id, current_match.user.id)
 
-            if not repository.RepoTinderUser.tinder_user_exists(current_match.user):
-                print("TinderUser %r is a previous match and is missing from the db. Adding now." % current_match.user)
-
-                try:
-                    repository.RepoTinderUser.add_tinder_user(TinderUser(current_match.user))
-                except Exception as e:
-                    print("Could not add TinderUser %r to the database. Reason: %s" % (current_match.user, e))
-
-            if not repository.RepoMatch.match_exists(pynder_session.profile.id, current_match.user.id):
-                print("There is no match between %r and %r in the database. Adding now." % (pynder_session.profile.id, current_match.user.id))
-
-                try:
-                    repository.RepoMatch.add(Match(pynder_session.profile.id, current_match.user.id))
-                except Exception as e:
-                    print("Could not add match between %r and %r to the database. Reason: %s" % (pynder_session.profile.id, current_match.user.id, e))
-            else:
-                seen_messages = repository.RepoMatch.get_message_count(pynder_session.profile.id, current_match.user.id)
-
-            try:
-                profile_photo = list(pynder_session.profile.photos)[0]
-            except:
-                profile_photo = 'static/qms.png'
+        try:
+            profile_photo = list(pynder_session.profile.photos)[0]
+        except:
+            profile_photo = 'static/qms.png'
 
 
-            message_list = current_match.messages
+        message_list = current_match.messages
 
-            if request.json['active']:
-                if int(request.json['messageNumber']) == 0:
-                    return render_template("messages.html", \
-                            messages=message_list, \
-                            user=pynder_session.profile, \
-                            profile_photo=profile_photo)
+        if request.json['active']:
+            if int(request.json['messageNumber']) == 0:
+                return render_template("messages.html", \
+                        messages=message_list, \
+                        user=pynder_session.profile, \
+                        profile_photo=profile_photo)
 
-                if len(message_list) > seen_messages:
-                    repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
-                    message_list = message_list[int(request.json['messageNumber']):]
-                    return render_template("messages.html", \
-                            messages=message_list, \
-                            user=pynder_session.profile, \
-                            profile_photo=profile_photo)
-            else:
-                if len(message_list) > seen_messages:
-                    return jsonify("1")
+            if len(message_list) > seen_messages:
+                repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
+                message_list = message_list[int(request.json['messageNumber']):]
+                return render_template("messages.html", \
+                        messages=message_list, \
+                        user=pynder_session.profile, \
+                        profile_photo=profile_photo)
+        else:
+            if len(message_list) > seen_messages:
+                return jsonify("1")
         return ""
 
 
