@@ -1,35 +1,35 @@
 {% block messages %}
-{% for message in messages %}
+  {% for message in messages %}
     {% if message.sender == user %}
-        <li class="right clearfix"><span class="chat-img pull-right">
-                            <img src="{{ user.photos[0] if user.photos_obj|length > 0 else '/static/qms.png' }}"
-                                 alt="User Avatar" class="img-circle img-message"/>
-                        </span>
-            <div class="chat-body clearfix">
-                <div class="header">
-                    <small class=" text-muted"><span
-                            class="glyphicon glyphicon-time"></span>{{ message.sent.strftime('%Y-%m-%d %H:%M') }}
-                    </small>
-                    <strong class="pull-right primary-font">You</strong>
-                </div>
-                <p>{{ message.body }}</p>
-            </div>
-        </li>
+    <li class="right clearfix"><span class="chat-img pull-right">
+        <img src="{{ profile_photo }}"
+             alt="User Avatar" class="img-circle img-message"/>
+      </span>
+      <div class="chat-body clearfix">
+        <div class="header">
+          <small class=" text-muted"><span
+                 class="glyphicon glyphicon-time"></span>{{ message.sent.strftime('%Y-%m-%d %H:%M') }}
+          </small>
+          <strong class="pull-right primary-font">You</strong>
+        </div>
+        <pre>{{ message.body }}</pre>
+      </div>
+    </li>
     {% else %}
-        <li class="left clearfix"><span class="chat-img pull-left">
-                            <img src="{{ message.sender.photos[0] if message.sender.photos[0] != 'http://images.gotinder.com/0001unknown/unknown.jpg' else '/static/qms.png' }}"
-                                 alt="User Avatar" class="img-circle img-message"/>
-                        </span>
-            <div class="chat-body clearfix">
-                <div class="header">
-                    <strong class="primary-font">{{ message.sender.name }}</strong>
-                    <small class="pull-right text-muted">
-                        <span class="glyphicon glyphicon-time"></span>{{ message.sent.strftime('%Y-%m-%d %H:%M') }}
-                    </small>
-                </div>
-                <p>{{ message.body }}</p>
-            </div>
-        </li>
+    <li class="left clearfix"><span class="chat-img pull-left">
+        <img src="{{ message.sender.photos[0] if message.sender.photos[0] != 'http://images.gotinder.com/0001unknown/unknown.jpg' else '/static/qms.png' }}"
+             alt="User Avatar" class="img-circle img-message"/>
+      </span>
+      <div class="chat-body clearfix">
+        <div class="header">
+          <strong class="primary-font">{{ message.sender.name }}</strong>
+          <small class="pull-right text-muted">
+            <span class="glyphicon glyphicon-time"></span>{{ message.sent.strftime('%Y-%m-%d %H:%M') }}
+          </small>
+        </div>
+        <pre>{{ message.body }}</pre>
+      </div>
+    </li>
     {% endif %}
-{% endfor %}
+  {% endfor %}
 {% endblock %}
