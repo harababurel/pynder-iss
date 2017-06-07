@@ -1,6 +1,8 @@
 from collections import defaultdict
+import repository
 
 class StatisticsGenerator:
+
     @staticmethod
     def generate_age_statistics(hopefuls):
         data = {
@@ -19,7 +21,8 @@ class StatisticsGenerator:
         }
 
         data['ages'] = sorted(list(set([x.age for x in hopefuls])))
-        data['distances'] = sorted(list(set([round(x.distance_km) for x in hopefuls])))
+        data['distances'] = sorted(
+            list(set([round(x.distance_km) for x in hopefuls])))
 
         for gender in ['male', 'female']:
             data[gender]['count'] = len(
@@ -43,7 +46,10 @@ class StatisticsGenerator:
         return data
 
     @staticmethod
-    def generate_vote_statistics(given, received):
+    def generate_vote_statistics(profile):
+        given = list(repository.RepoVote.get_all_of_voter(profile.id))
+        received = list(repository.RepoVote.get_all_of_hopeful(profile.id))
+
         fields = ["dislike", "like", "superlike"]
 
         data = {
@@ -56,10 +62,11 @@ class StatisticsGenerator:
         }
 
         for key in fields:
-            data['given'][key] = len(list(filter(lambda e: e.value == key, given)))
-            data['received'][key] = len(list(filter(lambda e: e.value == key, received)))
+            data['given'][key] = len(
+                list(filter(lambda e: e.value == key, given)))
+            data['received'][key] = len(
+                list(filter(lambda e: e.value == key, received)))
             data['given']['total'] += data['given'][key]
             data['received']['total'] += data['received'][key]
 
         return data
-

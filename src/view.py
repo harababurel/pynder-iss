@@ -70,7 +70,8 @@ class SwipeView(View, ApplicationView):
         pynder_session = self.get_pynder_session()
         try:
             current_person = next(pynder_session.nearby_users())
-            repository.RepoTinderUser.add_tinder_user(TinderUser(current_person))
+            repository.RepoTinderUser.add_tinder_user(
+                TinderUser(current_person))
         except Exception as e:
             return render_template("base.html",
                                    error="No people nearby. %s" % e)
@@ -120,7 +121,8 @@ class VoteView(MethodView, ApplicationView):
 
         if match is not False:
 
-            repository.RepoMatch.add(Match(pynder_session.profile.id, hopeful.id))
+            repository.RepoMatch.add(
+                Match(pynder_session.profile.id, hopeful.id))
 
             message = "You have got a new match!"
             if match['is_super_like']:
@@ -142,26 +144,19 @@ class StatisticsView(MethodView, ApplicationView):
             return render_template('index.html')
 
         if category == 'general':
-
             hopefuls = list(repository.RepoHopeful.get_all_hopefuls())
-
             data = StatisticsGenerator.generate_age_statistics(hopefuls)
-
-            pretty_data = pformat(data, indent=2).replace("\n", "<br>")
-            return render_template('statistics.html',
-                                   data=data,
-                                   pretty_data=pretty_data)
-
+            data['category'] = 'general'
         else:
             pynder_session = self.get_pynder_session()
             profile = pynder_session.profile
-            given = list(repository.RepoVote.get_all_of_voter(profile.id))
-            received = list(repository.RepoVote.get_all_of_hopeful(profile.id))
+            data = StatisticsGenerator.generate_vote_statistics(profile)
+            data['category'] = 'personal'
 
-
-            data = StatisticsGenerator.generate_vote_statistics(given, received)
-            print(pformat(data, indent=2))
-            return "no personal statistics yet"
+        pretty_data = pformat(data, indent=2).replace("\n", "<br>")
+        return render_template('statistics.html',
+                               data=data,
+                               pretty_data=pretty_data)
 
 
 class LoginView(MethodView, ApplicationView):
@@ -192,7 +187,8 @@ class LoginView(MethodView, ApplicationView):
             # session['access_token'] = access_token
 
             pynder_session = self.get_pynder_session()
-            repository.RepoTinderUser.add_tinder_user(TinderUser(pynder_session.profile))
+            repository.RepoTinderUser.add_tinder_user(
+                TinderUser(pynder_session.profile))
 
             return redirect(url_for('index'))
 
@@ -266,9 +262,11 @@ class MessagesView(MethodView, ApplicationView):
             seen_messages = 0
 
             if not repository.RepoMatch.match_exists(pynder_session.profile.id, current_match.user.id):
-                repository.RepoMatch.add(Match(pynder_session.profile.id, current_match.user.id))
+                repository.RepoMatch.add(
+                    Match(pynder_session.profile.id, current_match.user.id))
             else:
-                seen_messages = repository.RepoMatch.get_message_count(pynder_session.profile.id, current_match.user.id)
+                seen_messages = repository.RepoMatch.get_message_count(
+                    pynder_session.profile.id, current_match.user.id)
 
             message_list = current_match.messages
 
@@ -277,8 +275,10 @@ class MessagesView(MethodView, ApplicationView):
                     return render_template("messages.html", messages=message_list, user=pynder_session.profile)
 
                 if len(message_list) > seen_messages:
-                    message_list = message_list[int(request.json['messageNumber']):]
-                    repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
+                    message_list = message_list[
+                        int(request.json['messageNumber']):]
+                    repository.RepoMatch.set_message_count(
+                        pynder_session.profile.id, current_match.user.id, len(message_list))
                     return render_template("messages.html", messages=message_list, user=pynder_session.profile)
             else:
                 if len(message_list) > seen_messages:
