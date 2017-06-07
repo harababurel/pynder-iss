@@ -148,6 +148,21 @@ class RepoVote(RepoGen):
         return db.session.query(Vote).filter(
             Vote.hopeful_id == vote.hopeful_id and Vote.voter_id == vote.voter_id).first()
 
+#    Using filter in query in order to take advantage of index optimization
+    @staticmethod
+    def get_all_of_voter(voter_id):
+        for vote in db.session.query(Vote).filter(Vote.voter_id == voter_id).all():
+            yield vote
+
+    @staticmethod
+    def get_all_of_hopeful(hopeful_id):
+        for vote in db.session.query(Vote).filter(Vote.hopeful_id == hopeful_id).all():
+            yield vote
+
+    @staticmethod
+    def get_all():
+        for vote in db.session.query(Vote):
+            yield vote
 
 class RepoMatch(RepoGen):
 
