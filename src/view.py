@@ -10,7 +10,7 @@ import repository
 from fb_auth import get_access_token
 from form_util import SettingsForm
 from models import TinderUser, Hopeful, Match, Vote
-from statistics import generate_age_statistics
+from statistics import StatisticsGenerator
 
 
 class ApplicationView():
@@ -164,18 +164,20 @@ class StatisticsView(MethodView, ApplicationView):
         if not self.logged_in():
             return render_template('index.html')
 
-        hopefuls = list(repository.RepoHopeful.get_all_hopefuls())
-
         if category == 'general':
-            data = generate_age_statistics(hopefuls)
-            pretty_data = pformat(data, indent=2).replace("\n", "<br>")
-            return render_template('statistics.html',
-                                   data=data,
-                                   pretty_data=pretty_data)
-
+            hopefuls = list(repository.RepoHopeful.get_all_hopefuls())
+            data = StatisticsGenerator.generate_age_statistics(hopefuls)
+            data['category'] = 'general'
         else:
-            data = None
-            return "no personal statistics yet"
+            pynder_session = self.get_pynder_session()
+            profile = pynder_session.profile
+            data = StatisticsGenerator.generate_vote_statistics(profile)
+            data['category'] = 'personal'
+
+        pretty_data = pformat(data, indent=2).replace("\n", "<br>")
+        return render_template('statistics.html',
+                               data=data,
+                               pretty_data=pretty_data)
 
 
 class LoginView(MethodView, ApplicationView):

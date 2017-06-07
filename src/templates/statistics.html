@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js"></script>
 <br>
 <div class="row">
   <div class="col-md-3"></div>
@@ -11,19 +11,27 @@
   <div class="col-md-6">
     <div class="panel panel-danger">
       <div class="panel-heading">
-        <h3 class="panel-title">General</h3>
+        <h3 class="panel-title">{{ data['category']|title }} statistics</h3>
       </div>
       <div class="panel-body">
 
-        <pre>{{ pretty_data|safe }}</pre>
+        {% if data['category'] == 'general' %}
         <canvas id="gender-distribution-chart" width="800" height="450"></canvas>
-
         <hr>
         <canvas id="age-distribution-chart" width="800" height="450"></canvas>
-
         <hr>
         <canvas id="distance-distribution-chart" width="800" height="450"></canvas>
+        {% else %}
+        <canvas id="given-votes-chart" width="800" height="450"></canvas>
 
+        {% if data['received']['total'] > 0 %}
+        <hr>
+        <canvas id="received-votes-chart" width="800" height="450"></canvas>
+        {% endif %}
+
+        {% endif %}
+
+        <!-- <pre>{{ pretty_data|safe }}</pre> -->
 
       </div>
     </div>
@@ -32,6 +40,7 @@
   <div class="col-md-3"></div>
 </div>
 
+{% if data['category'] == 'general' %}
 <script>
 new Chart(document.getElementById("gender-distribution-chart"), {
   type: 'doughnut',
@@ -53,7 +62,6 @@ new Chart(document.getElementById("gender-distribution-chart"), {
   }
 });
 </script>
-
 
 <script>
 new Chart(document.getElementById("age-distribution-chart"), {
@@ -124,6 +132,53 @@ new Chart(document.getElementById("distance-distribution-chart"), {
   }
 });
 </script>
+
+{% else %}
+<script>
+new Chart(document.getElementById("given-votes-chart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Like", "Dislike", "Superlike"],
+    datasets: [
+      {
+        label: "Total count",
+        backgroundColor: ["#2ecc71", "#e74c3c", "#3498db"],
+        data: [{% for vote in ['like', 'dislike', 'superlike'] %} {{ data['given'][vote] }}, {% endfor %}],
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Votes given'
+    }
+  }
+});
+</script>
+
+<script>
+new Chart(document.getElementById("received-votes-chart"), {
+  type: 'doughnut',
+  data: {
+    labels: ["Like", "Dislike", "Superlike"],
+    datasets: [
+      {
+        label: "Total count",
+        backgroundColor: ["#2ecc71", "#e74c3c", "#3498db"],
+        data: [{% for vote in ['like', 'dislike', 'superlike'] %} {{ data['received'][vote] }}, {% endfor %}],
+      }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'Votes received'
+    }
+  }
+});
+</script>
+
+{% endif %}
 
 
 
