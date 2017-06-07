@@ -134,7 +134,7 @@
                                 Message
                                 <span class="glyphicon glyphicon-envelope"></span>
                             </button>
-                            <button class="btn btn-outline-danger btn-xs pull-right">
+                            <button class="btn btn-outline-danger btn-xs pull-right" id="unmatch">
                                 Unmatch<span class="glyphicon glyphicon-remove"></span>
                             </button>
                         </div>
@@ -163,4 +163,16 @@
         <div class="col-md-2"></div>
     </div>
     <script src="/static/chat.js"></script>
+    <script>
+        $('#unmatch').click(function (e) {
+            let id = $(this).closest('.collapse').attr('id');
+            $.ajax({
+                type: 'POST',
+                url: '/unmatch/' + id,
+                success: function (data) {
+                    location.reload();
+                }
+            });
+        })
+    </script>
 {% endblock %}
