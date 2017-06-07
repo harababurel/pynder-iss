@@ -70,7 +70,7 @@ class chat {
                     thisClass.updateScroll();
                 if (data.responseText !== "" && !thisClass.notified) {
                     thisClass.notified = true;
-                    $('#title' + thisClass.matchId).append('<span class="label label-primary notification" style="float: right; margin-right: 5px">New message</span>');
+                    $('#title' + thisClass.matchId).find(".pull-right").append('<span class="label label-primary notification" style="display: block">New message</span>');
                 }
                 if (!thisClass.notified)
                     thisClass.timer = setTimeout(thisClass.updateRequest.bind(thisClass), REQUEST_INTERVAL);
