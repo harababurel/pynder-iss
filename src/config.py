@@ -1,5 +1,5 @@
 config = {
-    'debug': False,
+    'debug': True,
     'port': 8114,
     'secret_key': 'asdf',
     'max_matches_shown': 5,
