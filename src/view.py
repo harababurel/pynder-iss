@@ -268,10 +268,24 @@ class MessagesView(MethodView, ApplicationView):
                     return render_template("messages.html", messages=message_list, user=pynder_session.profile)
 
                 if len(message_list) > seen_messages:
-                    message_list = message_list[int(request.json['messageNumber']):]
                     repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
+                    message_list = message_list[int(request.json['messageNumber']):]
                     return render_template("messages.html", messages=message_list, user=pynder_session.profile)
             else:
                 if len(message_list) > seen_messages:
                     return jsonify("1")
         return ""
+
+
+class UnmatchView(MethodView, ApplicationView):
+
+    def post(self, id):
+        pynder_session = self.get_pynder_session()
+        current_match = None
+        for match in list(itertools.islice(
+                pynder_session.matches(), 0, config['max_matches_shown'])):
+
+            if match.user.id == id:
+                current_match = match
+            current_match.delete()
+            return ""
