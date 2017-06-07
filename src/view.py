@@ -280,7 +280,7 @@ class MessagesView(MethodView, ApplicationView):
                     print("Could not add match between %r and %r to the database. Reason: %s" % (pynder_session.profile.id, match.user.id, e))
 
 
-        if current_match is not None:
+        if current_match is None:
             seen_messages = 0
         else:
             seen_messages = repository.RepoMatch.get_message_count(pynder_session.profile.id, current_match.user.id)
@@ -293,8 +293,10 @@ class MessagesView(MethodView, ApplicationView):
 
         message_list = current_match.messages
 
+        print(len(message_list), seen_messages)
         if request.json['active']:
             if int(request.json['messageNumber']) == 0:
+                repository.RepoMatch.set_message_count(pynder_session.profile.id, current_match.user.id, len(message_list))
                 return render_template("messages.html", \
                         messages=message_list, \
                         user=pynder_session.profile, \
