@@ -70,24 +70,24 @@ class TinderUser(db.Model):
                 for photo in data.photos:
                     self.photos.append(Photo(photo, self.id))
 
-        if hasattr(data, 'jobs'):
-            for job in data.jobs:
-                userjob = UserJob()
-                if RepoJob.job_exists(job):
-                    userjob.job = RepoJob.get_job(job)
-                else:
-                    userjob.job = Job(job)
-                self.jobs.append(userjob)
+            if hasattr(data, 'jobs'):
+                for job in data.jobs:
+                    userjob = UserJob()
+                    if RepoJob.job_exists(job):
+                        userjob.job = RepoJob.get_job(job)
+                    else:
+                        userjob.job = Job(job)
+                    self.jobs.append(userjob)
 
-        if hasattr(data, 'schools'):
-            for school in data.schools:
-                userschool = UserSchool()
-                if RepoSchool.school_exists(school):
-                    userschool.school = RepoSchool.get_school(school)
-                else:
-                    userschool.school = School(school)
+            if hasattr(data, 'schools'):
+                for school in data.schools:
+                    userschool = UserSchool()
+                    if RepoSchool.school_exists(school):
+                        userschool.school = RepoSchool.get_school(school)
+                    else:
+                        userschool.school = School(school)
 
-                self.schools.append(userschool)
+                    self.schools.append(userschool)
 
 
 class Vote(db.Model):
